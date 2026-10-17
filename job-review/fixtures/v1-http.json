@@ -1,0 +1,1030 @@
+{
+  "description": "Synthetic API v1 examples from an isolated temporary database. No real accounts, jobs, applications, or credentials. Worker lifecycle is simulated directly for the question examples.",
+  "token": "fixture-session-token",
+  "sequence": [
+    {
+      "name": "capabilities",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/capabilities"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "4af768fcacdcce312df948db0fc2757d1c39a7891f25e14ffb8b6c7facb8d4d4",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "capabilities": {
+            "api_version": 1,
+            "worker_enabled": false,
+            "worker_status": "not_configured",
+            "explicit_apply": true,
+            "questions": true,
+            "feed_delivery": "poll",
+            "question_scopes": [
+              "application"
+            ],
+            "remote_access": false
+          }
+        }
+      }
+    },
+    {
+      "name": "initial_feed",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/feed"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "bc3dc25f7294d25670eea42c603198099ac02000d7457d4f572dbe3e65c1dab8",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "cards": [
+            {
+              "id": "c1eefe58-3a6a-441e-b995-228c54f01ce8",
+              "revision": "49fd0aca9a6d35d164ddb56506b862b702f5427d35770c0ba6820f7fba5d9fd7",
+              "company": {
+                "id": "a",
+                "name": "Alpha",
+                "data": {
+                  "id": "a",
+                  "name": "Alpha",
+                  "summary": "Backend work"
+                },
+                "excluded": false,
+                "research_status": "none",
+                "note": "",
+                "revision": 1,
+                "first_seen": "2026-10-12T23:23:16.536812+00:00",
+                "updated_at": "2026-10-12T23:23:16.536812+00:00"
+              },
+              "jobs": [
+                {
+                  "changed": false,
+                  "company_id": "a",
+                  "data": {
+                    "arrangement": "Hybrid",
+                    "gaps": [
+                      "Kubernetes is unconfirmed."
+                    ],
+                    "job_id": "1",
+                    "level": "Senior",
+                    "location": "San Francisco",
+                    "rank": 1,
+                    "salary": "$100–200",
+                    "title": "Engineer 1",
+                    "url": "https://jobs.example/a/1"
+                  },
+                  "decision": "pending",
+                  "first_seen": "2026-10-12T23:23:16.536812+00:00",
+                  "job_id": "1",
+                  "key": "a:1",
+                  "note": "",
+                  "revision": 1,
+                  "updated_at": "2026-10-12T23:23:16.536812+00:00"
+                },
+                {
+                  "changed": false,
+                  "company_id": "a",
+                  "data": {
+                    "arrangement": "Hybrid",
+                    "gaps": [
+                      "Kubernetes is unconfirmed."
+                    ],
+                    "job_id": "2",
+                    "level": "Senior",
+                    "location": "San Francisco",
+                    "rank": 2,
+                    "salary": "$100–200",
+                    "title": "Engineer 2",
+                    "url": "https://jobs.example/a/2"
+                  },
+                  "decision": "pending",
+                  "first_seen": "2026-10-12T23:23:16.536812+00:00",
+                  "job_id": "2",
+                  "key": "a:2",
+                  "note": "",
+                  "revision": 1,
+                  "updated_at": "2026-10-12T23:23:16.536812+00:00"
+                },
+                {
+                  "changed": false,
+                  "company_id": "a",
+                  "data": {
+                    "arrangement": "Hybrid",
+                    "gaps": [
+                      "Kubernetes is unconfirmed."
+                    ],
+                    "job_id": "3",
+                    "level": "Senior",
+                    "location": "San Francisco",
+                    "rank": 3,
+                    "salary": "$100–200",
+                    "title": "Engineer 3",
+                    "url": "https://jobs.example/a/3"
+                  },
+                  "decision": "pending",
+                  "first_seen": "2026-10-12T23:23:16.536812+00:00",
+                  "job_id": "3",
+                  "key": "a:3",
+                  "note": "",
+                  "revision": 1,
+                  "updated_at": "2026-10-12T23:23:16.536812+00:00"
+                }
+              ],
+              "created_at": "2026-10-12T23:23:16.539377+00:00",
+              "content": null
+            },
+            {
+              "id": "af3062bb-12fc-41c9-bc18-80a4fe2838f0",
+              "revision": "8f1467c209126461ab9e3a742ef22ba684b447112ab2ad3af8e11442aef535d2",
+              "company": {
+                "id": "b",
+                "name": "Beta",
+                "data": {
+                  "id": "b",
+                  "name": "Beta"
+                },
+                "excluded": false,
+                "research_status": "none",
+                "note": "",
+                "revision": 1,
+                "first_seen": "2026-10-12T23:23:16.536812+00:00",
+                "updated_at": "2026-10-12T23:23:16.536812+00:00"
+              },
+              "jobs": [
+                {
+                  "changed": false,
+                  "company_id": "b",
+                  "data": {
+                    "job_id": "b1",
+                    "location": "Remote",
+                    "title": "Backend Engineer",
+                    "url": "https://jobs.example/b/1"
+                  },
+                  "decision": "pending",
+                  "first_seen": "2026-10-12T23:23:16.536812+00:00",
+                  "job_id": "b1",
+                  "key": "b:b1",
+                  "note": "",
+                  "revision": 1,
+                  "updated_at": "2026-10-12T23:23:16.536812+00:00"
+                }
+              ],
+              "created_at": "2026-10-12T23:23:16.539409+00:00",
+              "content": null
+            }
+          ],
+          "counts": {
+            "ready_cards": 2,
+            "ready_jobs": 4
+          },
+          "refill": {
+            "low_watermark": 10,
+            "target_cards": 30,
+            "next_allowed_at": null
+          },
+          "capabilities": {
+            "api_version": 1,
+            "worker_enabled": false,
+            "worker_status": "not_configured",
+            "explicit_apply": true,
+            "questions": true,
+            "feed_delivery": "poll",
+            "question_scopes": [
+              "application"
+            ],
+            "remote_access": false
+          }
+        }
+      }
+    },
+    {
+      "name": "apply_accepted",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/decisions",
+        "body": {
+          "request_id": "fixture-apply",
+          "action": "apply",
+          "card_id": "c1eefe58-3a6a-441e-b995-228c54f01ce8",
+          "card_revision": "49fd0aca9a6d35d164ddb56506b862b702f5427d35770c0ba6820f7fba5d9fd7",
+          "selected": [
+            "a:1"
+          ],
+          "note": "Apply to this exact job version."
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "token": "fixture-session-token",
+          "request_id": "fixture-apply",
+          "accepted": true,
+          "decision_id": "fixture-apply",
+          "card_id": "c1eefe58-3a6a-441e-b995-228c54f01ce8",
+          "action": "apply",
+          "process_ids": [
+            "6b33797b-592a-4840-b68f-d7fd2f161376"
+          ],
+          "task_ids": [
+            "85ec7fc6-a0e1-406e-abdf-f19a675a852e"
+          ]
+        }
+      }
+    },
+    {
+      "name": "apply_exact_replay",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/decisions",
+        "body": {
+          "request_id": "fixture-apply",
+          "action": "apply",
+          "card_id": "c1eefe58-3a6a-441e-b995-228c54f01ce8",
+          "card_revision": "49fd0aca9a6d35d164ddb56506b862b702f5427d35770c0ba6820f7fba5d9fd7",
+          "selected": [
+            "a:1"
+          ],
+          "note": "Apply to this exact job version."
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "token": "fixture-session-token",
+          "accepted": true,
+          "action": "apply",
+          "card_id": "c1eefe58-3a6a-441e-b995-228c54f01ce8",
+          "decision_id": "fixture-apply",
+          "process_ids": [
+            "6b33797b-592a-4840-b68f-d7fd2f161376"
+          ],
+          "request_id": "fixture-apply",
+          "task_ids": [
+            "85ec7fc6-a0e1-406e-abdf-f19a675a852e"
+          ]
+        }
+      }
+    },
+    {
+      "name": "apply_request_id_conflict",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/decisions",
+        "body": {
+          "request_id": "fixture-apply",
+          "action": "apply",
+          "card_id": "c1eefe58-3a6a-441e-b995-228c54f01ce8",
+          "card_revision": "49fd0aca9a6d35d164ddb56506b862b702f5427d35770c0ba6820f7fba5d9fd7",
+          "selected": [
+            "a:1"
+          ],
+          "note": "Changed body"
+        }
+      },
+      "response": {
+        "status": 409,
+        "body": {
+          "schema_version": 1,
+          "error": {
+            "code": "conflict",
+            "message": "This request ID already belongs to another command.",
+            "commit_status": "not_committed",
+            "reason": "request_id_conflict"
+          }
+        }
+      }
+    },
+    {
+      "name": "stale_card_conflict",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/decisions",
+        "body": {
+          "request_id": "fixture-stale",
+          "action": "apply",
+          "card_id": "c1eefe58-3a6a-441e-b995-228c54f01ce8",
+          "card_revision": "49fd0aca9a6d35d164ddb56506b862b702f5427d35770c0ba6820f7fba5d9fd7",
+          "selected": [
+            "a:1"
+          ],
+          "note": "Apply to this exact job version."
+        }
+      },
+      "response": {
+        "status": 409,
+        "body": {
+          "schema_version": 1,
+          "error": {
+            "code": "conflict",
+            "message": "This card changed or was reviewed. Refresh before making a new decision.",
+            "commit_status": "not_committed",
+            "reason": "stale_revision"
+          }
+        }
+      }
+    },
+    {
+      "name": "process_queued",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/processes"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "7ab5bb71ac7560f58e939f3c743515813f711a769f83c1c7290fe1e932ad200d",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "processes": [
+            {
+              "id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+              "job_key": "a:1",
+              "task_id": "85ec7fc6-a0e1-406e-abdf-f19a675a852e",
+              "decision_id": "fixture-apply",
+              "snapshot": {
+                "arrangement": "Hybrid",
+                "company_id": "a",
+                "company_name": "Alpha",
+                "gaps": [
+                  "Kubernetes is unconfirmed."
+                ],
+                "job_id": "1",
+                "job_key": "a:1",
+                "job_revision": 2,
+                "level": "Senior",
+                "location": "San Francisco",
+                "material_hash": "9f49ba25e399ed532e8222721c0da68161048ea7f9fa1a7335265f4fbc81b56e",
+                "rank": 1,
+                "salary": "$100–200",
+                "title": "Engineer 1",
+                "url": "https://jobs.example/a/1"
+              },
+              "submission_status": "not_started",
+              "recruiting_status": "awaiting_response",
+              "revision": 1,
+              "receipt": null,
+              "block_reason": null,
+              "form_version": null,
+              "created_at": "2026-10-12T23:23:16.541438+00:00",
+              "updated_at": "2026-10-12T23:23:16.541438+00:00",
+              "task_status": "queued",
+              "events": [
+                {
+                  "id": 1,
+                  "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+                  "type": "authorized",
+                  "actor": "user",
+                  "data": {
+                    "decision_id": "fixture-apply",
+                    "job_revision": 2
+                  },
+                  "created_at": "2026-10-12T23:23:16.541572+00:00"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "tasks_queued",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/tasks"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "66e5861f7f0da40b504ea7e7e1b40a5b572745cac478d1c63356e3302ade9171",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "tasks": [
+            {
+              "id": "85ec7fc6-a0e1-406e-abdf-f19a675a852e",
+              "kind": "apply",
+              "status": "queued",
+              "attempts": 0,
+              "failure_count": 0,
+              "max_attempts": 3,
+              "available_at": "2026-10-12T23:23:16.541471+00:00",
+              "resource": "browser",
+              "resource_quarantined": false,
+              "error": null,
+              "created_at": "2026-10-12T23:23:16.541471+00:00",
+              "updated_at": "2026-10-12T23:23:16.541471+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "questions_empty",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/questions"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "5c9253d29ca1fc9c4f7683bfe5dadd87e2dbce3e46af6ee80404bc7259b41e1e",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "questions": []
+        }
+      }
+    },
+    {
+      "name": "questions_waiting",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/questions"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "f252d9771484793f33b3659da053767fbb79e398b7951560495eedaf89fa48fe",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "questions": [
+            {
+              "id": "fixture-question-choice",
+              "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+              "form_version": "fixture-form-v1",
+              "revision": 1,
+              "text": "Which work location do you prefer?",
+              "type": "single_choice",
+              "choices": [
+                {
+                  "id": "sf",
+                  "label": "San Francisco"
+                },
+                {
+                  "id": "ny",
+                  "label": "New York"
+                }
+              ],
+              "required": true,
+              "scope": "application",
+              "reason": "Select a location.",
+              "answer": null,
+              "answered_at": null,
+              "created_at": "2026-10-12T23:23:16.549289+00:00",
+              "updated_at": "2026-10-12T23:23:16.549289+00:00"
+            },
+            {
+              "id": "fixture-question-multi",
+              "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+              "form_version": "fixture-form-v1",
+              "revision": 1,
+              "text": "Which interview time windows work for you?",
+              "type": "multi_choice",
+              "choices": [
+                {
+                  "id": "morning",
+                  "label": "Morning"
+                },
+                {
+                  "id": "afternoon",
+                  "label": "Afternoon"
+                }
+              ],
+              "required": false,
+              "scope": "application",
+              "reason": "Optional scheduling preference.",
+              "answer": null,
+              "answered_at": null,
+              "created_at": "2026-10-12T23:23:16.549289+00:00",
+              "updated_at": "2026-10-12T23:23:16.549289+00:00"
+            },
+            {
+              "id": "fixture-question-text",
+              "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+              "form_version": "fixture-form-v1",
+              "revision": 1,
+              "text": "Why does this role interest you?",
+              "type": "text",
+              "choices": [],
+              "required": true,
+              "scope": "application",
+              "reason": "Employer-specific answer required.",
+              "answer": null,
+              "answered_at": null,
+              "created_at": "2026-10-12T23:23:16.549289+00:00",
+              "updated_at": "2026-10-12T23:23:16.549289+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "process_waiting_for_user",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/processes"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "790e5f3f5c8735584a09dbdc35a758f9b84f47999394ce7a47c7b72a23f30819",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "processes": [
+            {
+              "id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+              "job_key": "a:1",
+              "task_id": "85ec7fc6-a0e1-406e-abdf-f19a675a852e",
+              "decision_id": "fixture-apply",
+              "snapshot": {
+                "arrangement": "Hybrid",
+                "company_id": "a",
+                "company_name": "Alpha",
+                "gaps": [
+                  "Kubernetes is unconfirmed."
+                ],
+                "job_id": "1",
+                "job_key": "a:1",
+                "job_revision": 2,
+                "level": "Senior",
+                "location": "San Francisco",
+                "material_hash": "9f49ba25e399ed532e8222721c0da68161048ea7f9fa1a7335265f4fbc81b56e",
+                "rank": 1,
+                "salary": "$100–200",
+                "title": "Engineer 1",
+                "url": "https://jobs.example/a/1"
+              },
+              "submission_status": "preparing",
+              "recruiting_status": "awaiting_response",
+              "revision": 3,
+              "receipt": null,
+              "block_reason": "questions_pending",
+              "form_version": "fixture-form-v1",
+              "created_at": "2026-10-12T23:23:16.541438+00:00",
+              "updated_at": "2026-10-12T23:23:16.549289+00:00",
+              "task_status": "waiting_for_user",
+              "events": [
+                {
+                  "id": 1,
+                  "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+                  "type": "authorized",
+                  "actor": "user",
+                  "data": {
+                    "decision_id": "fixture-apply",
+                    "job_revision": 2
+                  },
+                  "created_at": "2026-10-12T23:23:16.541572+00:00"
+                },
+                {
+                  "id": 2,
+                  "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+                  "type": "preparing",
+                  "actor": "worker",
+                  "data": {
+                    "task_id": "85ec7fc6-a0e1-406e-abdf-f19a675a852e"
+                  },
+                  "created_at": "2026-10-12T23:23:16.547396+00:00"
+                },
+                {
+                  "id": 3,
+                  "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+                  "type": "questions_requested",
+                  "actor": "worker",
+                  "data": {
+                    "form_version": "fixture-form-v1",
+                    "question_ids": [
+                      "fixture-question-text",
+                      "fixture-question-choice",
+                      "fixture-question-multi"
+                    ]
+                  },
+                  "created_at": "2026-10-12T23:23:16.549402+00:00"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "answers_accepted",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/answers",
+        "body": {
+          "request_id": "fixture-answers",
+          "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+          "process_revision": 3,
+          "form_version": "fixture-form-v1",
+          "answers": [
+            {
+              "question_id": "fixture-question-text",
+              "question_revision": 1,
+              "value": "I want to work on reliable backend systems."
+            },
+            {
+              "question_id": "fixture-question-choice",
+              "question_revision": 1,
+              "value": "sf"
+            },
+            {
+              "question_id": "fixture-question-multi",
+              "question_revision": 1,
+              "value": [
+                "morning",
+                "afternoon"
+              ]
+            }
+          ]
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "token": "fixture-session-token",
+          "request_id": "fixture-answers",
+          "accepted": true,
+          "process_ids": [
+            "6b33797b-592a-4840-b68f-d7fd2f161376"
+          ],
+          "task_ids": [
+            "85ec7fc6-a0e1-406e-abdf-f19a675a852e"
+          ]
+        }
+      }
+    },
+    {
+      "name": "answers_exact_replay",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/answers",
+        "body": {
+          "request_id": "fixture-answers",
+          "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+          "process_revision": 3,
+          "form_version": "fixture-form-v1",
+          "answers": [
+            {
+              "question_id": "fixture-question-text",
+              "question_revision": 1,
+              "value": "I want to work on reliable backend systems."
+            },
+            {
+              "question_id": "fixture-question-choice",
+              "question_revision": 1,
+              "value": "sf"
+            },
+            {
+              "question_id": "fixture-question-multi",
+              "question_revision": 1,
+              "value": [
+                "morning",
+                "afternoon"
+              ]
+            }
+          ]
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "token": "fixture-session-token",
+          "accepted": true,
+          "process_ids": [
+            "6b33797b-592a-4840-b68f-d7fd2f161376"
+          ],
+          "request_id": "fixture-answers",
+          "task_ids": [
+            "85ec7fc6-a0e1-406e-abdf-f19a675a852e"
+          ]
+        }
+      }
+    },
+    {
+      "name": "questions_answered",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/questions"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "b7249e14cc54c80cf1437704159a828b780f2a2f26d2f5ebb83e318479950272",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "questions": [
+            {
+              "id": "fixture-question-choice",
+              "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+              "form_version": "fixture-form-v1",
+              "revision": 2,
+              "text": "Which work location do you prefer?",
+              "type": "single_choice",
+              "choices": [
+                {
+                  "id": "sf",
+                  "label": "San Francisco"
+                },
+                {
+                  "id": "ny",
+                  "label": "New York"
+                }
+              ],
+              "required": true,
+              "scope": "application",
+              "reason": "Select a location.",
+              "answer": "sf",
+              "answered_at": "2026-10-12T23:23:16.551839+00:00",
+              "created_at": "2026-10-12T23:23:16.549289+00:00",
+              "updated_at": "2026-10-12T23:23:16.551839+00:00"
+            },
+            {
+              "id": "fixture-question-multi",
+              "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+              "form_version": "fixture-form-v1",
+              "revision": 2,
+              "text": "Which interview time windows work for you?",
+              "type": "multi_choice",
+              "choices": [
+                {
+                  "id": "morning",
+                  "label": "Morning"
+                },
+                {
+                  "id": "afternoon",
+                  "label": "Afternoon"
+                }
+              ],
+              "required": false,
+              "scope": "application",
+              "reason": "Optional scheduling preference.",
+              "answer": [
+                "morning",
+                "afternoon"
+              ],
+              "answered_at": "2026-10-12T23:23:16.551839+00:00",
+              "created_at": "2026-10-12T23:23:16.549289+00:00",
+              "updated_at": "2026-10-12T23:23:16.551839+00:00"
+            },
+            {
+              "id": "fixture-question-text",
+              "process_id": "6b33797b-592a-4840-b68f-d7fd2f161376",
+              "form_version": "fixture-form-v1",
+              "revision": 2,
+              "text": "Why does this role interest you?",
+              "type": "text",
+              "choices": [],
+              "required": true,
+              "scope": "application",
+              "reason": "Employer-specific answer required.",
+              "answer": "I want to work on reliable backend systems.",
+              "answered_at": "2026-10-12T23:23:16.551839+00:00",
+              "created_at": "2026-10-12T23:23:16.549289+00:00",
+              "updated_at": "2026-10-12T23:23:16.551839+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "find_more_accepted",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/decisions",
+        "body": {
+          "request_id": "fixture-find-more",
+          "action": "find_more",
+          "card_id": "af3062bb-12fc-41c9-bc18-80a4fe2838f0",
+          "card_revision": "8f1467c209126461ab9e3a742ef22ba684b447112ab2ad3af8e11442aef535d2",
+          "selected": [],
+          "exclude_job_keys": [
+            "b:b1"
+          ],
+          "note": "Find more backend roles at this company."
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "token": "fixture-session-token",
+          "request_id": "fixture-find-more",
+          "accepted": true,
+          "decision_id": "fixture-find-more",
+          "card_id": "af3062bb-12fc-41c9-bc18-80a4fe2838f0",
+          "action": "find_more",
+          "process_ids": [],
+          "task_ids": [
+            "bbc7177d-dd4e-4998-b342-02cdf43df238"
+          ]
+        }
+      }
+    },
+    {
+      "name": "cancel_accepted",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/tasks/cancel",
+        "body": {
+          "request_id": "fixture-cancel",
+          "task_id": "bbc7177d-dd4e-4998-b342-02cdf43df238"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "token": "fixture-session-token",
+          "request_id": "fixture-cancel",
+          "accepted": true,
+          "process_ids": [],
+          "task_ids": [
+            "bbc7177d-dd4e-4998-b342-02cdf43df238"
+          ]
+        }
+      }
+    },
+    {
+      "name": "cancel_exact_replay",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/tasks/cancel",
+        "body": {
+          "request_id": "fixture-cancel",
+          "task_id": "bbc7177d-dd4e-4998-b342-02cdf43df238"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "token": "fixture-session-token",
+          "accepted": true,
+          "process_ids": [],
+          "request_id": "fixture-cancel",
+          "task_ids": [
+            "bbc7177d-dd4e-4998-b342-02cdf43df238"
+          ]
+        }
+      }
+    },
+    {
+      "name": "feed_empty",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/feed"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "b883ee621ea372dc98a2294c3f18d94aa2f5b057c609677abdb943a30bd3f328",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "cards": [],
+          "counts": {
+            "ready_cards": 0,
+            "ready_jobs": 0
+          },
+          "refill": {
+            "low_watermark": 10,
+            "target_cards": 30,
+            "next_allowed_at": null
+          },
+          "capabilities": {
+            "api_version": 1,
+            "worker_enabled": false,
+            "worker_status": "not_configured",
+            "explicit_apply": true,
+            "questions": true,
+            "feed_delivery": "poll",
+            "question_scopes": [
+              "application"
+            ],
+            "remote_access": false
+          }
+        }
+      }
+    },
+    {
+      "name": "tasks_after_cancel",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/tasks"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "ed1aba1717cc18df1c029e7f7f5e70948626a8f00018b836ec1d64a422b718f7",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "tasks": [
+            {
+              "id": "85ec7fc6-a0e1-406e-abdf-f19a675a852e",
+              "kind": "apply",
+              "status": "queued",
+              "attempts": 1,
+              "failure_count": 0,
+              "max_attempts": 3,
+              "available_at": "2026-10-12T23:23:16.551883+00:00",
+              "resource": "browser",
+              "resource_quarantined": false,
+              "error": null,
+              "created_at": "2026-10-12T23:23:16.541471+00:00",
+              "updated_at": "2026-10-12T23:23:16.551885+00:00"
+            },
+            {
+              "id": "bbc7177d-dd4e-4998-b342-02cdf43df238",
+              "kind": "explore",
+              "status": "cancelled",
+              "attempts": 0,
+              "failure_count": 0,
+              "max_attempts": 3,
+              "available_at": "2026-10-12T23:23:16.557186+00:00",
+              "resource": "browser",
+              "resource_quarantined": false,
+              "error": null,
+              "created_at": "2026-10-12T23:23:16.555202+00:00",
+              "updated_at": "2026-10-12T23:23:16.557187+00:00"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "error_examples": {
+    "invalid_request": {
+      "status": 400,
+      "body": {
+        "schema_version": 1,
+        "error": {
+          "code": "invalid_request",
+          "message": "The request must be a JSON object.",
+          "commit_status": "not_committed",
+          "reason": null
+        }
+      }
+    },
+    "forbidden": {
+      "status": 403,
+      "body": {
+        "schema_version": 1,
+        "error": {
+          "code": "forbidden",
+          "message": "Refresh the page before saving.",
+          "commit_status": "not_committed",
+          "reason": null
+        }
+      }
+    },
+    "not_found": {
+      "status": 404,
+      "body": {
+        "schema_version": 1,
+        "error": {
+          "code": "not_found",
+          "message": "Action not found.",
+          "commit_status": "not_committed",
+          "reason": null
+        }
+      }
+    },
+    "unknown_commit": {
+      "status": 500,
+      "body": {
+        "schema_version": 1,
+        "error": {
+          "code": "internal_error",
+          "message": "The command outcome is uncertain. Retry the same request unchanged.",
+          "commit_status": "unknown",
+          "reason": null
+        }
+      }
+    }
+  }
+}

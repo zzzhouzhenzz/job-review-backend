@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "database": "../review.sqlite3",
+  "gateway": {
+    "access_config": "access.json",
+    "credential_file": "credential.txt",
+    "cert_file": "fullchain.pem",
+    "key_file": "private-key.pem",
+    "backend_port": 8766,
+    "listen_address": "127.0.0.1",
+    "listen_port": 8443,
+    "caddy": "../../.tools/caddy/2.11.7/caddy"
+  }
+}

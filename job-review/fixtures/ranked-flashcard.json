@@ -1,0 +1,259 @@
+{
+  "description": "Synthetic ranked card produced by WorkflowStore in an isolated temporary database. Ranking and applicant evidence are simulated. No agent, LLM, source site, or real application was used.",
+  "applicant_evidence": [
+    "Fictional profile: backend engineering and backend reliability work.",
+    "Fictional profile: Kubernetes, platform-specific tools, and direct metrics stack experience are unconfirmed."
+  ],
+  "source_catalog": {
+    "companies": [
+      {
+        "id": "fixture-company",
+        "name": "Example Systems",
+        "summary": "Fictional company for contract tests.",
+        "jobs": [
+          {
+            "job_id": "1",
+            "title": "Backend Platform Engineer",
+            "url": "https://jobs.example/platform",
+            "rank": 1,
+            "description": "Develop backend platform services.",
+            "brief": {
+              "work": "Original platform posting summary.",
+              "fit": "Original source fit note.",
+              "gap": "Platform tools need verification."
+            }
+          },
+          {
+            "job_id": "2",
+            "title": "Service Observability Engineer",
+            "url": "https://jobs.example/observability",
+            "rank": 2,
+            "description": "Build service metrics and diagnostics.",
+            "brief": {
+              "work": "Original observability posting summary.",
+              "fit": "Original source fit note.",
+              "gap": "Metrics stack experience is unknown."
+            }
+          },
+          {
+            "job_id": "3",
+            "title": "Backend Reliability Engineer",
+            "url": "https://jobs.example/reliability",
+            "rank": 3,
+            "description": "Improve reliability of backend services.",
+            "brief": {
+              "work": "Original reliability posting summary.",
+              "fit": "Original source fit note.",
+              "gap": "Kubernetes experience is unconfirmed."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "rank_result": {
+    "cards": [
+      {
+        "company_id": "fixture-company",
+        "summary": "Backend reliability is the strongest match to the fictional profile. Platform work is next; observability needs more evidence.",
+        "jobs": [
+          {
+            "key": "fixture-company:3",
+            "revision": 1,
+            "reason": "This role directly matches the supplied backend reliability experience.",
+            "brief": {
+              "work": "Improve the reliability of backend services.",
+              "fit": "The fictional profile includes backend reliability work.",
+              "gap": "Kubernetes experience is unconfirmed."
+            }
+          },
+          {
+            "key": "fixture-company:1",
+            "revision": 1,
+            "reason": "Backend service experience is relevant, but the platform tools need verification.",
+            "brief": {
+              "work": "Develop backend platform services.",
+              "fit": "The fictional profile includes backend engineering.",
+              "gap": "Platform-specific tools need verification."
+            }
+          },
+          {
+            "key": "fixture-company:2",
+            "revision": 1,
+            "reason": "The role is adjacent to the supplied reliability experience; direct metrics work is unknown.",
+            "brief": {
+              "work": "Build service metrics and diagnostics.",
+              "fit": "Backend reliability experience provides related context.",
+              "gap": "Direct metrics stack experience is unknown."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "request": {
+    "method": "GET",
+    "path": "/api/v1/feed"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "schema_version": 1,
+      "revision": "081e36198b90013404697f0b0d5b791a2da9c21bb1e528373a3c47cb87855330",
+      "complete": true,
+      "next_cursor": null,
+      "token": "fixture-session-token",
+      "cards": [
+        {
+          "id": "c4d44f25-652b-4c04-8ed5-3092c8718b6b",
+          "revision": "1f5c420b57bddacde251ed3b86fa70d82a50ce0bec46b8326dff279bf1bb070d",
+          "company": {
+            "id": "fixture-company",
+            "name": "Example Systems",
+            "data": {
+              "id": "fixture-company",
+              "name": "Example Systems",
+              "summary": "Fictional company for contract tests."
+            },
+            "excluded": false,
+            "research_status": "none",
+            "note": "",
+            "revision": 1,
+            "first_seen": "2026-10-12T23:54:01.776122+00:00",
+            "updated_at": "2026-10-12T23:54:01.776122+00:00"
+          },
+          "jobs": [
+            {
+              "changed": false,
+              "company_id": "fixture-company",
+              "data": {
+                "brief": {
+                  "fit": "Original source fit note.",
+                  "gap": "Kubernetes experience is unconfirmed.",
+                  "work": "Original reliability posting summary."
+                },
+                "description": "Improve reliability of backend services.",
+                "job_id": "3",
+                "rank": 3,
+                "title": "Backend Reliability Engineer",
+                "url": "https://jobs.example/reliability"
+              },
+              "decision": "pending",
+              "first_seen": "2026-10-12T23:54:01.776122+00:00",
+              "job_id": "3",
+              "key": "fixture-company:3",
+              "note": "",
+              "revision": 1,
+              "updated_at": "2026-10-12T23:54:01.776122+00:00"
+            },
+            {
+              "changed": false,
+              "company_id": "fixture-company",
+              "data": {
+                "brief": {
+                  "fit": "Original source fit note.",
+                  "gap": "Platform tools need verification.",
+                  "work": "Original platform posting summary."
+                },
+                "description": "Develop backend platform services.",
+                "job_id": "1",
+                "rank": 1,
+                "title": "Backend Platform Engineer",
+                "url": "https://jobs.example/platform"
+              },
+              "decision": "pending",
+              "first_seen": "2026-10-12T23:54:01.776122+00:00",
+              "job_id": "1",
+              "key": "fixture-company:1",
+              "note": "",
+              "revision": 1,
+              "updated_at": "2026-10-12T23:54:01.776122+00:00"
+            },
+            {
+              "changed": false,
+              "company_id": "fixture-company",
+              "data": {
+                "brief": {
+                  "fit": "Original source fit note.",
+                  "gap": "Metrics stack experience is unknown.",
+                  "work": "Original observability posting summary."
+                },
+                "description": "Build service metrics and diagnostics.",
+                "job_id": "2",
+                "rank": 2,
+                "title": "Service Observability Engineer",
+                "url": "https://jobs.example/observability"
+              },
+              "decision": "pending",
+              "first_seen": "2026-10-12T23:54:01.776122+00:00",
+              "job_id": "2",
+              "key": "fixture-company:2",
+              "note": "",
+              "revision": 1,
+              "updated_at": "2026-10-12T23:54:01.776122+00:00"
+            }
+          ],
+          "content": {
+            "jobs": [
+              {
+                "brief": {
+                  "fit": "The fictional profile includes backend reliability work.",
+                  "gap": "Kubernetes experience is unconfirmed.",
+                  "work": "Improve the reliability of backend services."
+                },
+                "key": "fixture-company:3",
+                "reason": "This role directly matches the supplied backend reliability experience.",
+                "revision": 1
+              },
+              {
+                "brief": {
+                  "fit": "The fictional profile includes backend engineering.",
+                  "gap": "Platform-specific tools need verification.",
+                  "work": "Develop backend platform services."
+                },
+                "key": "fixture-company:1",
+                "reason": "Backend service experience is relevant, but the platform tools need verification.",
+                "revision": 1
+              },
+              {
+                "brief": {
+                  "fit": "Backend reliability experience provides related context.",
+                  "gap": "Direct metrics stack experience is unknown.",
+                  "work": "Build service metrics and diagnostics."
+                },
+                "key": "fixture-company:2",
+                "reason": "The role is adjacent to the supplied reliability experience; direct metrics work is unknown.",
+                "revision": 1
+              }
+            ],
+            "schema_version": 1,
+            "source": "ranker",
+            "summary": "Backend reliability is the strongest match to the fictional profile. Platform work is next; observability needs more evidence."
+          },
+          "created_at": "2026-10-12T23:54:01.783363+00:00"
+        }
+      ],
+      "counts": {
+        "ready_cards": 1,
+        "ready_jobs": 3
+      },
+      "refill": {
+        "low_watermark": 10,
+        "target_cards": 30,
+        "next_allowed_at": null
+      },
+      "capabilities": {
+        "api_version": 1,
+        "worker_enabled": false,
+        "worker_status": "not_configured",
+        "explicit_apply": true,
+        "questions": true,
+        "feed_delivery": "poll",
+        "question_scopes": [
+          "application"
+        ],
+        "remote_access": false
+      }
+    }
+  }
+}

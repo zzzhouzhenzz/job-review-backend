@@ -1,0 +1,129 @@
+{
+  "description": "Synthetic health responses from temporary databases and an in-process fake runtime. IDs and timestamps are fixed for this fixture. No Chrome, LinkedIn, Codex session, or external job was accessed. HTTP 200 means the API answered; worker dispatch requires health.ready to be true.",
+  "sequence": [
+    {
+      "name": "not_configured",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/health"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "29987f34b5511d9c4019cca8c0af3810b4e1f045e6600717cd1934c00762848a",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "health": {
+            "boot_id": "00000000-0000-4000-8000-000000000002",
+            "status": "not_configured",
+            "ready": false,
+            "checked_at": "2026-10-12T23:00:00.000000+00:00",
+            "expires_at": null,
+            "retry_at": "2026-10-12T23:00:30.000000+00:00",
+            "checks": [
+              {
+                "id": "storage",
+                "status": "passed",
+                "message": "The local database can be read and written."
+              },
+              {
+                "id": "chrome_attachment",
+                "status": "not_configured",
+                "message": "The Chrome and agent runtime is not configured."
+              },
+              {
+                "id": "linkedin_auth",
+                "status": "not_configured",
+                "message": "The Chrome and agent runtime is not configured."
+              },
+              {
+                "id": "linkedin_job_read",
+                "status": "not_configured",
+                "message": "The Chrome and agent runtime is not configured."
+              },
+              {
+                "id": "explorer_agent",
+                "status": "not_configured",
+                "message": "The Chrome and agent runtime is not configured."
+              },
+              {
+                "id": "ranker_agent",
+                "status": "not_configured",
+                "message": "The Chrome and agent runtime is not configured."
+              },
+              {
+                "id": "application_agent",
+                "status": "not_configured",
+                "message": "The Chrome and agent runtime is not configured."
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "ready",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/health"
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "schema_version": 1,
+          "revision": "469b6762d8bf8d0cc9a69a1c009ea18d66a2e10fdaae715ecf75264c47c80b1d",
+          "complete": true,
+          "next_cursor": null,
+          "token": "fixture-session-token",
+          "health": {
+            "boot_id": "00000000-0000-4000-8000-000000000001",
+            "status": "ready",
+            "ready": true,
+            "checked_at": "2026-10-12T23:00:00.000000+00:00",
+            "expires_at": "2026-10-12T23:05:00.000000+00:00",
+            "retry_at": null,
+            "checks": [
+              {
+                "id": "storage",
+                "status": "passed",
+                "message": "The local database can be read and written."
+              },
+              {
+                "id": "chrome_attachment",
+                "status": "passed",
+                "message": "Chrome is attached."
+              },
+              {
+                "id": "linkedin_auth",
+                "status": "passed",
+                "message": "LinkedIn sign-in was verified."
+              },
+              {
+                "id": "linkedin_job_read",
+                "status": "passed",
+                "message": "A complete LinkedIn job posting was read."
+              },
+              {
+                "id": "explorer_agent",
+                "status": "passed",
+                "message": "The explorer session is ready."
+              },
+              {
+                "id": "ranker_agent",
+                "status": "passed",
+                "message": "The ranker session is ready."
+              },
+              {
+                "id": "application_agent",
+                "status": "passed",
+                "message": "The application session is ready."
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

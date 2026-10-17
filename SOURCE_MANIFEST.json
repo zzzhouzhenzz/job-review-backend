@@ -1,0 +1,174 @@
+{
+  "export_date": "2026-10-16",
+  "scope": "Backend source, tests, contracts, static UI and fictional fixtures only. Production data and host configuration are excluded.",
+  "files": [
+    {
+      "path": "job-review/application_flow.py",
+      "sha256": "2cb61847824c3af98335460ea58bb3959f0501c043514f7bc196de844dd400ef"
+    },
+    {
+      "path": "job-review/device_access.py",
+      "sha256": "bdabdc1b376ad53de43bb0dfc969ca02c64b6d8ac4c57d40d210b22f94b7ec4e"
+    },
+    {
+      "path": "job-review/device_stack.py",
+      "sha256": "dd1fdc054dbeeb9d6dd99b3baa241f4771b5792e094cc56d7ad557e5644b2a1c"
+    },
+    {
+      "path": "job-review/import_catalog.py",
+      "sha256": "d3a3f812d9c5fe890d2bfefe72a0dc9d3ec5acaf79a7fc571de5e41f2cc7fccb"
+    },
+    {
+      "path": "job-review/orchestrator.py",
+      "sha256": "cdf85702e14a78b69b84d9bbe184c0718311d5b44add40390bab380aa56601d7"
+    },
+    {
+      "path": "job-review/ranking.py",
+      "sha256": "c9a16d4d62831f96fd3670d0e20bed6bf382f3131521eb0ab44f7f25a65ee24e"
+    },
+    {
+      "path": "job-review/readiness.py",
+      "sha256": "2b233a65e812a422e51e2060ce4d99d76a3f1f0cea6a92a43340ba7cd28cc1ed"
+    },
+    {
+      "path": "job-review/server.py",
+      "sha256": "2edf4176007fda0db538540081f11dde5a8bff373234c4411bb2bc6b97639a9d"
+    },
+    {
+      "path": "job-review/start.py",
+      "sha256": "1c2876f88ad12ea06b9a42379deee289933021caf84286ecc78aa2d65f6682e4"
+    },
+    {
+      "path": "job-review/store.py",
+      "sha256": "eb544b491012c1a2866a70f3338a6b88a12f79f10ad34199b7f992625916b533"
+    },
+    {
+      "path": "job-review/tailscale_backend.py",
+      "sha256": "f46ea4c4893102f2617c9019d528653802889a6268680efc277f4552157dc16f"
+    },
+    {
+      "path": "job-review/task_store.py",
+      "sha256": "66eedf4f4acfbc9dc84bac17dc42d33e102f93e108aae41bdc461bc9453379d3"
+    },
+    {
+      "path": "job-review/test_applications.py",
+      "sha256": "ea57ba1cbc87c67f16daccc8bd96748f5e6d4f0236b48f2f1ec427e1b03d417e"
+    },
+    {
+      "path": "job-review/test_authenticated_server.py",
+      "sha256": "6e4e1381b662fac9b6f819da9fe4444771a259992cd8d2b08663c30a9f55cff1"
+    },
+    {
+      "path": "job-review/test_device_access.py",
+      "sha256": "a5302944466da6c5c4c88536958bc0b82f44bfd0b8db221449d339b1724da097"
+    },
+    {
+      "path": "job-review/test_device_stack.py",
+      "sha256": "d7f8101991c3f1b336edb279fdef92f36fd3a6d2415f69db2813679aedac4385"
+    },
+    {
+      "path": "job-review/test_preflight_resource.py",
+      "sha256": "0e066513a9d70b10e7e3d38f06219b8285448f3968a2997b74ce9554867989ad"
+    },
+    {
+      "path": "job-review/test_ranked_cards.py",
+      "sha256": "330bb9a529d83f564ba5eb72fad9ea237402271ed3630b46e3872925d705a8ad"
+    },
+    {
+      "path": "job-review/test_readiness.py",
+      "sha256": "4e785d29ab6f3542a1bc249029bcc2137a9b30c283666e0db2ae5f4df7d07662"
+    },
+    {
+      "path": "job-review/test_readiness_server.py",
+      "sha256": "7e564fc5fe1fd1988fd85ae41e6a3177141910fbc0e4c9dc52965b45998f18d8"
+    },
+    {
+      "path": "job-review/test_regressions.py",
+      "sha256": "27032204410b4e518de5c5845330acd19eb62a05a532cec1fb01cb9470873504"
+    },
+    {
+      "path": "job-review/test_server.py",
+      "sha256": "3ca0142c473037f8f93ae17113ec524fb2e221c1ca01fca2ada530d0381180f9"
+    },
+    {
+      "path": "job-review/test_server_startup.py",
+      "sha256": "d68698c738106852b1616ec4401ebc114bcdec459787f815e39a865f50429e4f"
+    },
+    {
+      "path": "job-review/test_store.py",
+      "sha256": "2deaba6ae4907b0b66015b90885acaca98e97f9f8e2d641fdf600dfd23c970c8"
+    },
+    {
+      "path": "job-review/test_tailscale_backend.py",
+      "sha256": "a8f972086b8e33c1ff00963562461a3439db5767b1b33ccc878ff923f1a8cc35"
+    },
+    {
+      "path": "job-review/test_tasks.py",
+      "sha256": "6714ae886f1e3a210803e198f07f1c945f3b9ff7adcb842529939e6ea788b461"
+    },
+    {
+      "path": "job-review/test_tls_gateway.py",
+      "sha256": "722a10ea0b701057aa4f6be01b572f9c08b1d1596e2ac96ece1d231677e135c2"
+    },
+    {
+      "path": "job-review/test_tls_gateway_config.py",
+      "sha256": "ab761b1f8c78faaaaacc309d90ec5114f6f8cbe9d9ab54de5b4e51978943ead6"
+    },
+    {
+      "path": "job-review/test_v1_server.py",
+      "sha256": "e63831dc07f00cfa8ccdc1734f016685416183a48888eb3658777040bc62b600"
+    },
+    {
+      "path": "job-review/test_workflow.py",
+      "sha256": "40b53a41cbdebfaa6b60cb2e6ff23ce609694538696494e07260d34a5ac13d5f"
+    },
+    {
+      "path": "job-review/tls_gateway.py",
+      "sha256": "a28127ae855e3a5208e955cb4d32abc1d1314d36952f97d95de83608d7e4b698"
+    },
+    {
+      "path": "job-review/workflow.py",
+      "sha256": "0c509eb8510550797beae5465d99cf7dd40da485efd88607e11911fc965c8a67"
+    },
+    {
+      "path": "job-review/README.md",
+      "sha256": "3ac7359ccadd636540d6b774b362f434648cd82d0fd3320e17009055c997183b"
+    },
+    {
+      "path": "job-review/CONTRACT.md",
+      "sha256": "2aa89008103ace60c7c2087a4a90a2ead664a7762d9564b516ab67ca1f6be1bb"
+    },
+    {
+      "path": "job-review/CONTRACT_V1.md",
+      "sha256": "3525e948779ef01ae650811396d9fff4ee9d7f0c061e9dde5b12dff17a90123e"
+    },
+    {
+      "path": "job-review/index.html",
+      "sha256": "37d8871ce98ec137fcdaedec67d631545f5169b2775b1a5d09dc0353be0ed290"
+    },
+    {
+      "path": "job-review/test_ui.js",
+      "sha256": "10469a5a00d0a861219c595e65078789921c0eda17404afbc42f54b466fa78c1"
+    },
+    {
+      "path": "job-review/device-stack.example.json",
+      "sha256": "7a6bacaad8618f936146afb3420553407ba325f7c90b27a75ef0f53307cb9fa5"
+    },
+    {
+      "path": "job-review/fixtures/auth.json",
+      "sha256": "fbe56e2fbd3c8de310277da8e33755f2eab27de75958799b0106d8b283d3cb94"
+    },
+    {
+      "path": "job-review/fixtures/health.json",
+      "sha256": "353a79b593bfaeb7c8dfc6c9c0608079861a09aa3c2183fa4b68ebce7cbba240"
+    },
+    {
+      "path": "job-review/fixtures/ranked-flashcard.json",
+      "sha256": "cc2bdf1fa2de088022859aaa4899468d4244c2445b63e357d312f4f6ec9586c1"
+    },
+    {
+      "path": "job-review/fixtures/v1-http.json",
+      "sha256": "df97bdb5300162365563d40d260e545fba61be90e6d543d5db46627f72012667"
+    }
+  ]
+}
