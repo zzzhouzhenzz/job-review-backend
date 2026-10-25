@@ -1,9 +1,11 @@
 # Job workflow API v1
 
 This contract describes the implemented local backend. SQLite stores decisions,
-feed cards, tasks, application processes, question rounds, and receipts. The
-agent, LLM, Chrome, and employer integrations are unimplemented. An accepted
-Apply decision creates durable work; it does not mean an application was sent.
+feed cards, tasks, application processes, question rounds, and receipts. Optional
+Codex adapters implement source exploration, ranking, and application work through
+the existing Chrome profile. They run only with explicit runtime configuration.
+An accepted Apply decision creates durable work; it does not mean an application
+was sent. Implementation and fixture tests do not establish live deployment success.
 
 The iOS implementation belongs in `job-review-ios/`. The existing web app and
 legacy iOS transport can keep using the unversioned API in `CONTRACT.md`.
@@ -19,51 +21,61 @@ capability read, using only fictional hostnames and credentials.
 ## Architecture and control
 
 ```mermaid
-flowchart LR
-    IOS["iOS frontend\nRender cards, decisions, questions"]
-    RECEIVE["Decision Receiver\nDecisions, answers, cancellation"]
-    FEED["Feed Pusher\nStable cards, polling API"]
-    TRACK["Process Tracker\nSubmission, recruiting, questions"]
-    DB[("SQLite\nAuthoritative state and durable tasks")]
-    ORCH["Orchestrator\nSchedule, recover, dispatch"]
-    HEALTH["Readiness Monitor\nStorage, Chrome, LinkedIn, agent sessions"]
-    subgraph RUNTIME["Agent runtime adapters: unimplemented"]
-        EXP["Explorer\nGeneral or company research"]
-        RANK["Ranker\nSelect and order jobs; write card text"]
-        APPLY["Application Agent\nPrepare, ask, submit, confirm"]
+flowchart TB
+    IOS["iOS frontend<br/>Cards, decisions, questions, progress"]
+    API["Authenticated API<br/>Receive commands and serve snapshots"]
+    DB[("SQLite<br/>Decisions, tasks, evidence, cards, questions")]
+    ORCH["Orchestrator<br/>Schedule, recover, dispatch"]
+    STORAGE["Startup check<br/>Local storage only"]
+    subgraph RUNNER["WorkerRunner: independent execution lanes"]
+        DISC["Discovery lane<br/>Explore then Rank"]
+        APP["Application lane<br/>Prepare, ask, submit, confirm"]
     end
-    IOS -->|commands| RECEIVE
-    RECEIVE -->|atomic save| DB
-    DB -->|read| FEED
-    FEED -->|complete snapshot| IOS
-    DB -->|read| TRACK
-    TRACK -->|process and question snapshots| IOS
-    DB -->|pending work and feed count| ORCH
-    ORCH -->|task state and refill requests| DB
-    HEALTH -->|fresh readiness gate| ORCH
-    HEALTH -->|shared browser lease| DB
-    ORCH -.->|future dispatch| EXP
-    ORCH -.->|future dispatch| RANK
-    ORCH -.->|future dispatch| APPLY
-    EXP -.->|validated source batches| DB
-    RANK -.->|selected versions and card text| DB
-    APPLY -.->|fenced lifecycle calls| TRACK
-    TRACK -->|evidence and status| DB
+    subgraph CODEX["Optional Codex runtime: explicit configuration"]
+        EXP["Explorer agent<br/>Read source postings"]
+        RANK["Ranker agent<br/>Stored candidates + applicant evidence"]
+        APPLY["Application agents<br/>Prepare / Submit"]
+        CHROME["Task browser check + Chrome adapter<br/>Reuse or open signed-in LinkedIn tab<br/>One shared browser lease"]
+    end
+    OUTBOX["Private ranked-output JSON<br/>Durable export before publication"]
+    IOS <-->|"HTTPS commands and polling"| API
+    API <--> DB
+    STORAGE --> ORCH
+    DB -->|"Pending work and feed count"| ORCH
+    ORCH -->|"Task states"| DB
+    ORCH --> DISC
+    ORCH --> APP
+    DISC --> EXP
+    DISC --> RANK
+    APP --> APPLY
+    EXP <--> CHROME
+    APPLY <--> CHROME
+    EXP -->|"Validated source batch"| DB
+    DB -->|"Current candidates and exclusions"| RANK
+    RANK -->|"Validated top three and card text"| DB
+    DB -->|"Accepted result outbox"| OUTBOX
+    OUTBOX -->|"Publish cards after durable write"| DB
+    APPLY -->|"Questions, checkpoints, receipts"| DB
 ```
 
-The orchestrator controls work. SQLite is the source of truth. Reads do not wait
-for an agent. These are modules in one Python application, not separate services.
-The ranker owns the selection, order, and explanation of its selected jobs. The
-iOS frontend owns card rendering, layout, typography, and interactions. It uses
-the ranker's text; it does not generate its own reasons for the selection.
+The orchestrator controls work; SQLite holds authoritative state. HTTP reads do
+not wait for agents. These modules run in one backend process. Codex calls run
+in separate ephemeral processes with role-specific instructions. The ranker
+owns job selection, order, and explanation. The iOS app owns rendering and uses
+the ranker's supplied text.
 
-The HTTP server calls `Orchestrator.tick()` at most once every five seconds.
-A tick recovers expired leases, reconciles processes, and checks the feed buffer.
-It does not invoke a runtime. `Orchestrator.run_once()` can dispatch one task
-through an injected runtime. The default runtime is disabled and does not claim
-queued work. A configured runtime must pass the readiness gate before
-`run_once()` can claim a business task. Startup readiness runs separately in a
-background thread, so an unavailable agent does not delay HTTP startup.
+The HTTP server calls `Orchestrator.tick()` every five seconds. Worker lanes also
+call it before dispatch. A tick recovers expired leases, reconciles processes,
+repairs pending rank exports, and checks the feed buffer. It does not call an
+agent. `Orchestrator.run_once(kinds=None)` dispatches one task from the requested
+kinds intersected with the runtime's `supported_kinds`.
+
+`WorkerRunner` runs discovery (`explore`, `rank`) independently of application
+(`apply`). Explore and Apply use the same durable `browser` resource. Rank has no
+browser resource and can run while Apply uses Chrome. The default runtime is
+disabled; configured execution requires `--runtime-config`. Browser access is
+checked under the task lease when needed, not at startup. HTTP startup checks
+only storage. A browser failure does not prevent ranking stored postings.
 
 ## Transport and discovery
 
@@ -223,6 +235,7 @@ these fields remain `false` and `"not_configured"`.
 | `/api/v1/processes` | `processes` array |
 | `/api/v1/questions` | `questions` array |
 | `/api/v1/tasks` | `tasks` array |
+| `/api/v1/project-consent` | `project_consent` object; requires configured device authentication |
 
 Every successful read also contains these required fields:
 
@@ -247,58 +260,57 @@ question, and form versions before saving. Refresh both reads after a conflict.
 Keep process and question polling independent of a pending feed decision. A
 client can retain its visible card while it resolves an uncertain command.
 
-### Startup health and worker readiness
+### Storage health and on-demand browser readiness
 
-`GET /api/v1/health` uses the standard read envelope and returns HTTP 200 when
-the API can answer. A successful HTTP response does not establish worker
-readiness. The client must inspect `health.ready` and `health.status`.
+`GET /api/v1/health` uses the standard read envelope. HTTP 200 means the API can
+answer. The response describes observed health; it is not a global dispatch gate.
+Rank can run with `ready: false` when storage is healthy and Chrome is idle or
+blocked. Every Explore and Apply task must pass its own browser check.
 
 | Health field | Type and meaning |
 | --- | --- |
-| `boot_id` | Nonempty identifier for this monitor instance; a restart starts a new check |
-| `status` | `checking`, `ready`, `blocked`, `not_configured`, `timed_out`, or `stale` |
-| `ready` | Boolean; true only while all required checks passed and their result is still fresh |
-| `checked_at` | Timestamp of the latest completed or timed-out attempt, or `null` before a result exists |
-| `expires_at` | Freshness deadline for a successful result, or `null` |
-| `retry_at` | Earliest automatic retry time when applicable, or `null` |
-| `checks` | Complete array of the required checks below |
+| `boot_id` | Nonempty identifier for this monitor instance |
+| `status` | `checking`, `idle`, `ready`, `blocked`, or `not_configured` |
+| `ready` | True only after all three checks passed and the browser observation is still fresh |
+| `checked_at` | Timestamp of the latest health update, or `null` before any update |
+| `expires_at` | Deadline for a successful browser observation, otherwise `null` |
+| `retry_at` | Nullable retry timestamp; current on-demand reports use `null` |
+| `checks` | Complete array of the three checks below |
 
-Each check has required string fields `id`, `status`, and `message`. A check's
-status is `checking`, `passed`, `failed`, `blocked`, `not_configured`,
-`timed_out`, or `stale`. Messages give a short, safe explanation. Clients should
-use status values for behavior and display the message to explain the condition.
-Public responses omit raw session IDs, posting text, and exception details.
+Each check has required string fields `id`, `status`, and `message`. Current check
+statuses are `checking`, `on_demand`, `passed`, `failed`, `blocked`, and
+`not_configured`. Clients can retain support for older `stale` and `timed_out`
+reports. Public messages omit raw session identifiers, posting text, and adapter
+exception details.
 
 | Check ID | Passing condition |
 | --- | --- |
 | `storage` | SQLite quick check and a rollback-only write test succeed |
-| `chrome_attachment` | The adapter confirms that the Chrome plugin is attached to a usable session |
-| `linkedin_auth` | The same Chrome session is currently signed in to LinkedIn |
-| `linkedin_job_read` | The same session reads a complete LinkedIn job posting with its exact ID, URL, title, company, and description |
-| `explorer_agent` | Its dedicated session answers the current probe and supports `explore` |
-| `ranker_agent` | Its dedicated session answers the current probe and supports `rank` and `flashcard_text` |
-| `application_agent` | Its dedicated session answers the current probe and supports `apply`, `questions`, and `receipts` |
+| `chrome_attachment` | The task adapter confirms attachment to the existing Chrome profile |
+| `linkedin_auth` | The same session is signed in and supplies an exact usable LinkedIn tab ID and HTTPS URL |
 
-The server starts checks after binding the HTTP port. The default timeout is 30
-seconds and a passing result remains fresh for 300 seconds. Failed checks can
-retry after 30 seconds. Expired results become stale and need a new check.
-Only one probe can run at a time. A late result after a timeout cannot make the
-worker ready. The previous server's ready result is never reused at startup.
+After startup, an enabled runtime with healthy storage reports `idle`,
+`ready: false`, and browser checks `on_demand`. A disabled runtime reports
+`not_configured`. Startup and HTTP reads do not open a tab, read a posting, or
+start agent health probes. Storage failures can retry after 30 seconds.
 
-Preflight obtains the same durable `browser` resource lock used by application
-and exploration work. It is represented by an internal `reconcile` task with
-`purpose: "preflight"`. It waits when another worker owns the browser. If a
-probe times out, its browser lock stays quarantined until the probe has
-positively stopped. A timer alone does not prove that browser access stopped.
-The monitor does not launch repeated probes while an earlier call is hung.
+For Explore and Apply, the backend first acquires the task's `browser` lease and
+then calls `prepare_browser(task, lease)`. The runtime checks current tabs, reuses
+a LinkedIn tab or opens one in the existing profile, and verifies sign-in from
+page content. A clean blocked result parks that task in `waiting_for_user` and
+releases the browser. A successful result sets `ready: true` with nonnull
+`checked_at` and `expires_at`. Its observation expires after 300 seconds and
+returns to `idle`/`on_demand` without starting another check. A later browser task
+always checks again, even before that deadline.
 
-Unready workers cannot start a new business task. The API still accepts decisions
-and answers, and the scheduler can create refill tasks. An already running
-adapter must check session access again before an external action; a previous
-ready result is not a guarantee that access will remain available. Preflight does not
-discover new jobs, rank jobs, or submit an application. The HTTP server continues
-to schedule work without dispatching business tasks; actual runtime execution
-remains an integration boundary. There is no separate recheck POST endpoint.
+A browser timeout or interrupted call with uncertain completion parks the task
+and quarantines its resource. Killing the agent process does not prove a browser
+action stopped. The resource requires positive stop confirmation before reuse;
+an uncertain submission also requires receipt reconciliation before replay.
+The older `lease_preflight`/`timeout_preflight`/`stop_preflight` helpers remain for
+legacy recovery and regression tests. The active monitor creates no preflight
+`reconcile` task and does not use a global agent readiness probe. There is no
+separate recheck POST endpoint.
 
 ### Feed cards
 
@@ -440,6 +452,60 @@ different body that reuses the same ID is a conflict. Decision and cancellation
 receipts share one ID namespace; answers have a separate receipt table. Clients
 should still use unique IDs across all commands.
 
+### Project browser and resume consent
+
+`GET /api/v1/project-consent` uses the standard complete read envelope, including
+the current session `token`. Both GET and POST require valid device Bearer
+authentication. They return 401 when device authentication is not configured;
+loopback access alone cannot grant consent. POST also requires the exact configured
+`Origin` and current `X-Review-Token`, as with the other v1 commands.
+
+The `project_consent` object has this shape:
+
+```json
+{
+  "policy_id": "job-review-browser-resume",
+  "policy_version": 1,
+  "required": true,
+  "granted": false,
+  "scopes": ["browse_job_sources", "upload_approved_resume"],
+  "grant": null
+}
+```
+
+After agreement, `granted` is true and `grant` contains `id`, `policy_version`,
+`granted_at` (UTC timestamp), `source`, and `source_reference`. `source` is
+`authenticated_ui` for an authenticated Agree command, or `user_chat` for an
+operator import of an existing explicit instruction. The original grant and its
+provenance remain unchanged when a later client agrees again.
+
+Policy version 1 permits reading LinkedIn, company websites and official employer
+ATS job/application pages in the existing Chrome profile, plus upload of the
+configured approved resume only for explicitly approved jobs. It does not supply
+job or final submission approval, new legal consent, login/CAPTCHA completion,
+or Chrome/OS/tool permissions. The host relays fixed consent instructions and the
+recorded source to each browser worker; caller-supplied consent context is ignored.
+
+The first-use dialog sends `POST /api/v1/project-consent` with exactly:
+
+```json
+{"request_id":"stable-client-request-id","policy_version":1,"accepted":true}
+```
+
+Clients cannot supply scopes, source, free-text instructions or other fields.
+The success response uses the command envelope and contains `request_id`,
+`status: "accepted"`, and the saved `project_consent` object. Dismiss the dialog
+only after this response or a later authenticated read confirms the grant. Retry
+an uncertain request with the same request ID and body. Reusing an ID for a
+different command returns 409 `request_id_conflict`. A stale policy version
+returns 409 `consent_policy_changed`; invalid or extra fields return 400.
+
+Agreement is durable across restarts, not tied to a device or server session
+token. Missing agreement leaves Explore/Apply queued and unleased, with no attempt
+cost. Rank can continue. Granting it does not clear existing questions, posting
+changes, browser quarantine, or uncertain submission checkpoints. A grant alone
+does not create any application process or submission attempt.
+
 ### `POST /api/v1/decisions`
 
 | Request field | Required | Type and constraint |
@@ -504,7 +570,7 @@ All supplied answers are checked before any are saved. Each saved answer
 increments its question revision. The command also increments the process
 revision. A partial round stays blocked if a required question remains
 unanswered. Once all required answers exist, the same task returns to `queued`.
-The future worker must revalidate the form before using the answers.
+The application worker must revalidate the form before using the answers.
 
 The response has required `schema_version: 1`, `token`, `request_id`,
 `accepted: true`, `process_ids`, and `task_ids`. The ID arrays contain the affected
@@ -563,7 +629,7 @@ enters `preparing` when a worker starts. Questions use the task state
 `awaiting_response` is the stored recruiting default. Display it as employer
 response progress only after `submission_status == "submitted"`.
 
-Before any action that could submit, the future worker must call
+Before any action that could submit, the application worker must call
 `before_submit()`. This saves a submission attempt and sets
 `submission_unknown` before the external side effect. Only a validated receipt
 can change that state to `submitted`. A generic task success cannot mark an
@@ -575,6 +641,22 @@ restart the task. `resolve_submission(process_id, revision, receipt)` can record
 later positive evidence after the worker stops. It cannot infer failure from
 missing evidence or authorize another submission. This operator boundary is a
 Python method; there is no HTTP reconciliation command yet.
+
+The separate operator-only `submission_recovery.requeue_unstarted_submission()`
+can recover one abandoned attempt when a previously recorded native audit proves
+that the exact terminal submit turn contained only a user message. It requires
+two full snapshots, zero tools/children, the matching failed transport receipt,
+verified preparation-session binding and a durable stopped-worker event. The
+operator must back up first and supply explicit retry authorization, exact
+process revision, task timestamp and attempt ID. Current job approval, answers,
+profile projection, retry budget and quarantine checks still apply.
+
+This narrow repair preserves the attempt row, records a `not_started` resolution
+event with the prior checkpoint, clears only current submission markers, and
+queues the same task for fresh preparation. It never treats an absent employer
+receipt as proof. No HTTP route or scheduler calls this function. A different
+active browser owner remains untouched. Existing conservative upload and blocker
+checks are unchanged; historical attempts remain visible to those checks.
 
 `track_response()` requires a confirmed submission and evidence. It allows
 forward recruiting transitions; `rejected`, `withdrawn`, and `hired` are
@@ -714,17 +796,23 @@ respect reviewed posting versions and application exclusions.
 | `task_store.py` | Durable tasks, leases, retry limits, checkpoints, shared resource lock, quarantine |
 | `application_flow.py` | Authorization snapshots, questions, submission evidence, recruiting transitions |
 | `orchestrator.py` | Scheduling, one-task dispatch, runtime protocol, disabled default runtime |
-| `readiness.py` | Startup probes, current health report, deadlines, freshness, and worker readiness gate |
+| `readiness.py` | Storage-only startup health, per-task browser evidence, observed health freshness |
+| `worker_runner.py` | Independent discovery/application lanes and shutdown joins |
+| `codex_runtime.py` | Role instructions, task context, browser preparation, validated application phases |
+| `codex_transport.py` | Ephemeral CLI calls, private files, output validation, heartbeat, bounded cancellation |
+| `ranked_output.py` | Durable accepted-result outbox, atomic private JSON files, publication after export |
 | `server.py` | Legacy and v1 HTTP routes, transport checks, public projections, scheduling ticks |
 | `device_access.py` | Private device credentials, exact HTTPS origin configuration, and bearer verification |
 | `tls_gateway.py` | Caddy TLS configuration, backend authentication checks, verified HTTPS startup, and foreground cleanup |
 | `fixtures/v1-http.json` | Synthetic read, command, replay, question, cancellation, and error examples |
 | `fixtures/ranked-flashcard.json` | Synthetic rank result and published feed with frozen card text |
-| `fixtures/health.json` | Synthetic unconfigured and ready health responses |
+| `fixtures/health.json` | Synthetic unconfigured, idle, ready, and blocked health responses |
 | `fixtures/auth.json` | Synthetic device authentication failure and authenticated capability read |
 | `test_store.py`, `test_server.py` | Existing store and HTTP behavior |
 | `test_workflow.py`, `test_tasks.py`, `test_applications.py`, `test_v1_server.py`, `test_regressions.py`, `test_ranked_cards.py` | Workflow, worker state, application lifecycle, HTTP contract, discovery batches, and ranked card checks |
-| `test_preflight_resource.py` | Browser lease, timeout quarantine, and preflight cleanup checks |
+| `test_preflight_resource.py` | Retained legacy probe lease, quarantine, and cleanup checks |
+| `test_readiness.py`, `test_readiness_server.py`, `test_worker_runner.py` | On-demand checks, API responsiveness, lane concurrency, shutdown, and uncertainty |
+| `test_codex_runtime.py`, `test_codex_transport.py`, `test_rank_artifact.py` | Runtime boundaries, subprocess lifecycle, structured results, and durable export |
 
 From the repository directory, run:
 
@@ -756,67 +844,70 @@ agent work. Tests and fixtures validate local behavior with simulated inputs.
 They do not verify Chrome, LinkedIn sign-in, LLM ranking, employer submission,
 email, remote iPhone access, or notification delivery.
 
-The remaining integration boundary is `AgentRuntime`: implement current-session
-preflight checks, source access, ranking and text generation, and the Application
-Agent later. Long operations must renew their
-lease and stop after a failed renewal. Browser work must respect the shared
-resource lock and the application submission checkpoint. The backend does not
-implement that agent or browser behavior in this version.
+### Runtime configuration and browser boundary
 
-### Runtime preflight boundary
+`CodexRuntime` implements `AgentRuntime` with `CodexTransport`. It is loaded only
+when `server.py` or `tailscale_backend.py run` receives `--runtime-config PATH`.
+Without the option, the existing disabled runtime remains in use. The current
+Caddy `device_stack.py` does not load the runtime. Configuration alone is not
+evidence of a successful live browser or application run.
 
-`AgentRuntime.preflight(probe_id, lease)` is intentionally unimplemented. A future
-adapter must perform read-only checks through the real Chrome plugin and the
-dedicated agent sessions. It returns current evidence in this form:
+`load_runtime` accepts these JSON keys; unknown keys are rejected:
+
+| Key | Meaning |
+| --- | --- |
+| `schema_version` | Required integer `1` |
+| `codex_binary` | Required executable Codex CLI path |
+| `run_directory` | Required private (`0700`) directory for per-call files |
+| `evidence_files` | Existing confirmed applicant documents; required for Explore or Rank |
+| `application_profile` | Confirmed application answers; required when Apply is enabled |
+| `resume` | Approved resume file; required when Apply is enabled |
+| `application_index` | Existing application history file; required when Apply is enabled |
+| `supported_kinds` | Explicit subset of `explore`, `rank`, `apply`; defaults to all three |
+| `timeout_seconds` | Positive per-call deadline; defaults to 900 seconds |
+
+Relative paths resolve from the configuration file's directory. The config holds
+paths, not device credentials. Calls use ephemeral role-specific agents and the
+installed CLI's normal authentication/plugins. The transport reads input from
+private files through stdin, requests structured JSON, validates the result, and
+renews the task lease during long calls. It does not choose a model override.
+
+`AgentRuntime.prepare_browser(task, lease)` runs only for a leased Explore or
+Apply task. A successful result has this evidence shape:
 
 ```json
 {
-  "probe_id": "current-probe-nonce",
-  "chrome": {"attached": true, "session_id": "chrome-session"},
-  "linkedin": {"authenticated": true, "session_id": "chrome-session"},
-  "posting": {
-    "session_id": "chrome-session",
-    "url": "https://www.linkedin.com/jobs/view/123/",
-    "job_id": "123",
-    "title": "Example Backend Engineer",
-    "company": "Example Company",
-    "description": "Complete posting text read during this probe.",
-    "full_description": true
+  "chrome": {"attached": true, "session_id": "observed-chrome-profile"},
+  "linkedin": {
+    "authenticated": true,
+    "session_id": "observed-chrome-profile",
+    "tab_id": "observed-tab-id",
+    "url": "https://www.linkedin.com/jobs/"
   },
-  "agents": {
-    "explorer": {
-      "session_id": "explorer-session",
-      "probe_id": "current-probe-nonce",
-      "ready": true,
-      "capabilities": ["explore"]
-    },
-    "ranker": {
-      "session_id": "ranker-session",
-      "probe_id": "current-probe-nonce",
-      "ready": true,
-      "capabilities": ["rank", "flashcard_text"]
-    },
-    "application": {
-      "session_id": "application-session",
-      "probe_id": "current-probe-nonce",
-      "ready": true,
-      "capabilities": ["apply", "questions", "receipts"]
-    }
-  }
+  "blocker": ""
 }
 ```
 
-The example is synthetic. Chrome attachment, LinkedIn authentication, and the
-posting read must refer to the same session. Each agent needs its own session
-and must return the supplied probe ID after a fresh request and response. A
-stored session identifier, an existing browser process, or a cached posting does
-not satisfy this contract. The posting evidence must come from the authenticated
-page, not from a login screen or a public search excerpt. The adapter must obey
-its lease and stop after a failed renewal. The backend validates returned
-evidence; it cannot prove an adapter performed its promised external checks.
-The preflight callback must be synchronous. Its return, including an exception,
-means all browser actions started by that callback have stopped. It must not
-start detached browser work that continues after the callback returns.
+The example is synthetic. The runtime inspects existing Chrome tabs first and
+reuses a LinkedIn tab. If none exists, it opens LinkedIn in the current profile.
+It verifies sign-in from the page; a URL alone is insufficient. Login prompts,
+challenges, or inaccessible tabs produce a blocked result. There is no automated
+sign-in. The host passes the validated `chrome` and `linkedin` fields to the
+Explorer context or Application task; arbitrary returned fields are not forwarded.
+
+Browser roles use the Chrome plugin, not a new browser profile, CDP, extracted
+cookies, or direct LinkedIn HTTP APIs. Agent output and page content remain
+untrusted data. Host validation enforces job identity, revision, exclusions,
+authorization, question versions, and submission evidence. Runtime calls must
+not start detached browser work. Unknown completion raises
+`BrowserWorkUncertain` and preserves browser quarantine; a failed heartbeat
+cannot authorize a later result or action.
+
+Application work has a preparation call and a separate submission call. It can
+park with questions or a blocker before submission. Host code commits the
+submission checkpoint before starting the submission call. A matching observed
+receipt is required to mark success. This mechanism does not turn a fixture run
+or accepted Apply command into evidence that an employer application was sent.
 
 ### Ranker result boundary
 
@@ -871,8 +962,9 @@ companies and one to three jobs per card. Each selected job must belong to that
 company and match an eligible candidate's exact key and revision. Job keys must
 be unique. The order of `jobs` is the ranker's order of preference. A result with
 missing text, invalid membership, or stale versions is rejected as a whole;
-partial ranked cards are not published. This interface replaces the earlier
-selection-only result. No agent or LLM implementation is included.
+partial ranked cards are not published. `CodexRuntime.rank` implements this
+interface using stored candidates and configured applicant evidence. It has no
+Chrome dependency.
 
 Explorer results are bounded to 50 companies and 200 jobs per batch. Preserve
 source evidence in posting metadata. `verified_at` is optional and must be a
@@ -880,3 +972,24 @@ past timestamp with a time zone when supplied. An import does not invent a
 source verification time. Ranking distinguishes pending work from a completed
 rejection, so later batches remain eligible and unchanged rejections do not
 repeat after an empty exploration result.
+
+
+### Durable ranking output
+
+An accepted rank result commits its exact selected snapshots and text to SQLite
+with an immutable `wf_rank_outputs` outbox payload. The task waits with
+`error: "ranked_output_pending"` until export completes. Accepted cards remain
+hidden while their output is pending. The backend atomically writes
+`ranked-output/<task-id>.json` beside the database, using a `0700` directory and
+`0600` files, then marks the task succeeded and publishes eligible cards.
+
+Each JSON file contains `schema_version`, `task_id`, `card_ids`, `cards`, and
+`created_at`. Cards retain selected posting snapshots and ranker content. The
+file is a private, inspectable result; the iOS app reads the authenticated feed
+instead of opening this file.
+
+A crash or disk error leaves the committed result pending. Scheduling ticks retry
+export from SQLite without invoking the Ranker again. Generic task Resume rejects
+this state. Export completion and any next Explore request are committed once,
+including the valid empty-card case. Keep these files with the database when
+moving the backend.

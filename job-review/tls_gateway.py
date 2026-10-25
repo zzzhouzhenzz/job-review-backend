@@ -30,9 +30,9 @@ from device_access import DeviceAccess
 
 
 READ_PATHS = ("/api/v1/capabilities", "/api/v1/health", "/api/v1/feed",
-              "/api/v1/processes", "/api/v1/questions", "/api/v1/tasks",
+              "/api/v1/processes", "/api/v1/questions", "/api/v1/tasks", "/api/v1/unblock-instructions",
               "/api/state", "/api/export")
-WRITE_PATHS = ("/api/v1/decisions", "/api/v1/answers", "/api/v1/tasks/cancel",
+WRITE_PATHS = ("/api/v1/decisions", "/api/v1/answers", "/api/v1/tasks/cancel", "/api/v1/unblock-instructions",
                "/api/job", "/api/company", "/api/research", "/api/card",
                "/api/queue", "/api/cancel")
 MAX_PROBE_BYTES = 64 * 1024

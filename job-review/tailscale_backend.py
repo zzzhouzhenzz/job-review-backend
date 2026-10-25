@@ -2,7 +2,7 @@
 """Supervise the authenticated loopback API behind externally managed Tailscale Serve.
 
 This command does not install or configure Tailscale, expose a network listener,
-or enable agent adapters. Serve configuration may outlive this process.
+or enable agents unless --runtime-config is supplied. Serve configuration may outlive this process.
 """
 from __future__ import annotations
 
@@ -33,6 +33,8 @@ class BackendConfig:
     access_config: Path
     credential_file: Path
     port: int = 8766
+    runtime_config: Path | None = None
+    no_workers: bool = False
 
 
 @dataclass(frozen=True)
@@ -45,6 +47,8 @@ def check(config):
     """Validate authentication inputs without opening the database or a listener."""
     if type(config.port) is not int or not 1 <= config.port <= 65535:
         raise ValueError("Backend port must be an integer between 1 and 65535")
+    if type(config.no_workers) is not bool:
+        raise ValueError('No-workers must be an explicit boolean')
     if config.access_config is None or config.credential_file is None:
         raise ValueError("Private device access configuration and credential file are required")
     access = DeviceAccess.from_file(config.access_config)
@@ -68,12 +72,21 @@ class TailnetReviewServer(ReviewServer):
     request_timeout = 10
     max_connections = 16
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, no_workers=False, **kwargs):
+        self.no_workers=no_workers
+        if no_workers:
+            kwargs.update(run_workers=False,run_scheduling=False)
         self._slots = threading.BoundedSemaphore(self.max_connections)
         self._requests = set()
         self._requests_lock = threading.Lock()
         self._closing = False
         super().__init__(*args, **kwargs)
+
+    def worker_capabilities(self):
+        value=super().worker_capabilities()
+        if self.no_workers:
+            value.update(worker_enabled=False,worker_status='paused')
+        return value
 
     def get_request(self):
         request, address = super().get_request()
@@ -114,6 +127,9 @@ class TailnetReviewServer(ReviewServer):
                     pass
                 self.shutdown_request(request)
         super().server_close()
+        if self.no_workers and hasattr(self,'orchestrator'):
+            close=getattr(self.orchestrator.runtime,'close',None)
+            if callable(close):close()
 
     def handle_error(self, request, client_address):
         # Closing a partial request can make its handler reach EOF and then
@@ -150,11 +166,11 @@ def _probe(config, prepared):
             if (not isinstance(payload, dict) or type(payload.get("schema_version")) is not int
                     or payload["schema_version"] != 1 or not isinstance(capabilities, dict)
                     or capabilities.get("remote_access") is not True
-                    or capabilities.get("worker_enabled") is not False
+                    or type(capabilities.get("worker_enabled")) is not bool
                     or not isinstance(capabilities.get("worker_status"), str)):
-                raise ValueError("Backend must report authenticated access and disabled agent adapters")
+                raise ValueError("Backend must report authenticated access and a valid worker status")
             report = {"public_origin": prepared.access.public_origin, "local_api_reachable": True,
-                      "worker_status": capabilities["worker_status"], "worker_enabled": False}
+                      "worker_status": capabilities["worker_status"], "worker_enabled": capabilities["worker_enabled"]}
         finally:
             client.close()
     return report
@@ -176,6 +192,8 @@ class RunningBackend:
             raise RuntimeError("Backend serving thread failed") from self.failures[0]
         if not self.thread.is_alive():
             raise RuntimeError("Backend serving thread stopped unexpectedly")
+        if self.server.worker_runner is not None:
+            self.server.worker_runner.check_running()
 
 
 def _stop_backend(server, thread):
@@ -191,6 +209,10 @@ def _stop_backend(server, thread):
 @contextmanager
 def running_backend(config):
     prepared = check(config)
+    runtime = None
+    if config.runtime_config is not None:
+        from codex_runtime import load_runtime
+        runtime = load_runtime(config.runtime_config)
     with database_lock(config.database):
         # Keep the port reserved during the backup. ReviewServer also binds
         # before migration, so a subsequent port race cannot mutate the DB.
@@ -199,7 +221,8 @@ def running_backend(config):
             reservation.bind(("127.0.0.1", config.port))
             backup = backup_database(config.database)
         server = TailnetReviewServer(("127.0.0.1", config.port), config.database,
-                                    access_config=config.access_config)
+                                    access_config=config.access_config, runtime=runtime,
+                                    run_workers=runtime is not None,no_workers=config.no_workers)
         failures = []
 
         def serve():
@@ -229,9 +252,13 @@ def main(argv=None):
     parser.add_argument("--access-config", required=True, type=Path)
     parser.add_argument("--credential-file", required=True, type=Path)
     parser.add_argument("--port", type=int, default=8766)
+    parser.add_argument("--runtime-config", type=Path,
+                        help="Enable the configured local Codex worker lanes.")
+    parser.add_argument('--no-workers',action='store_true',
+                        help='Load the runtime and shared question API without worker threads or background scheduling.')
     args = parser.parse_args(argv)
     config = BackendConfig(args.db.expanduser(), args.access_config.expanduser(),
-                           args.credential_file.expanduser(), args.port)
+                           args.credential_file.expanduser(), args.port, args.runtime_config,args.no_workers)
 
     def stop(signum, frame):
         raise KeyboardInterrupt
@@ -252,7 +279,7 @@ def main(argv=None):
         with running_backend(config) as backend:
             if backend.backup is not None:
                 print(f"Database backup verified: {backend.backup}", flush=True)
-            print(f"Authenticated backend ready on 127.0.0.1:{config.port}; agent adapters remain disabled.", flush=True)
+            print(f"Authenticated backend ready on 127.0.0.1:{config.port}; workers configured={backend.server.orchestrator.runtime.enabled}; workers paused={config.no_workers}.", flush=True)
             print("Tailscale Serve is managed separately and may remain configured after shutdown.", flush=True)
             while True:
                 backend.check_running()

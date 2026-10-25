@@ -12,6 +12,8 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 from store import ReviewError, encode, now, text
+from readiness import RECOVERABLE_BROWSER_REASONS
+from application_pool import browser_resource
 
 
 TASK_KINDS = {"explore", "rank", "apply", "reconcile"}
@@ -47,6 +49,7 @@ CREATE TABLE IF NOT EXISTS wf_resource_locks (
  lease_token TEXT NOT NULL,
  quarantined INTEGER NOT NULL DEFAULT 0 CHECK(quarantined IN (0,1))
 );
+CREATE TABLE IF NOT EXISTS wf_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 """
 
 
@@ -133,7 +136,7 @@ class TaskMixin:
                 raise ReviewError("Task resource lease is no longer owned by this worker.", 409)
         return row
 
-    def lease_task(self, owner, kinds=None, lease_seconds=60):
+    def lease_task(self, owner, kinds=None, lease_seconds=60, *, application_worker_id=None):
         text(owner, "Worker owner", 200, required=True)
         _lease_deadline(lease_seconds)  # Validate before acquiring a write lock.
         if kinds is not None and (not isinstance(kinds, (list, tuple, set))
@@ -141,8 +144,25 @@ class TaskMixin:
             raise ReviewError("Task kinds must contain supported kinds.")
         with self.transaction(write=True) as db:
             self._recover_expired_tasks(db)
+            resumed = db.execute("SELECT value FROM wf_settings WHERE key='browser_resume_task'").fetchone()
             rows = db.execute("""SELECT * FROM wf_tasks WHERE status IN ('queued','retry_wait')
-                AND available_at<=? AND failure_count<max_attempts ORDER BY created_at,id""", (now(),)).fetchall()
+                AND available_at<=? AND failure_count<max_attempts
+                ORDER BY CASE WHEN id=? THEN 0 ELSE 1 END,created_at,id""",
+                (now(), resumed['value'] if resumed else None)).fetchall()
+            if application_worker_id is not None:
+                if getattr(self,'question_pool',None) is not None and db.execute(
+                        "SELECT 1 FROM wf_qpool_lock WHERE token IS NOT NULL AND expires_at>? "
+                        "AND owner_kind IN ('answer_handler','recovery')",(now(),)).fetchone():
+                    return None
+                candidate = self._prepare_slot_candidate(db, application_worker_id, rows)
+                rows = [candidate] if candidate is not None else []
+            else:
+                assigned = ({r[0] for r in db.execute('SELECT task_id FROM wf_apply_slots WHERE task_id IS NOT NULL')}
+                            if db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='wf_apply_slots'").fetchone() else set())
+                rows = [row for row in rows if row['id'] not in assigned]
+            resumed_id = next((row['id'] for row in rows if resumed and row['id'] == resumed['value']
+                and row['resource'] == 'browser' and row['kind'] in ('apply', 'explore')
+                and not _submission_started(row)), None)
             for row in rows:
                 # A health probe is run by its caller while holding the browser.
                 # A generic worker must never replay it, including after a stop.
@@ -150,12 +170,24 @@ class TaskMixin:
                     continue
                 if kinds is not None and row["kind"] not in kinds:
                     continue
+                # A resumed application retains priority over new discovery.
+                if row['resource'] == 'browser' and (resumed_id and row['id'] != resumed_id):
+                    continue
                 if row["resource"] is not None and db.execute(
                         "SELECT 1 FROM wf_resource_locks WHERE resource=?", (row["resource"],)).fetchone():
                     continue
                 if _submission_started(row):
                     db.execute("UPDATE wf_tasks SET status='waiting_for_user',error=?,updated_at=? WHERE id=?",
                                ("submission_unknown", now(), row["id"]))
+                    continue
+                if (not getattr(self,'browser_access_serialized',False)
+                        and application_worker_id is not None and db.execute(
+                        "SELECT 1 FROM wf_resource_locks WHERE resource='browser'").fetchone()):
+                    continue
+                # A legacy/global browser caller cannot overlap an isolated slot.
+                if (not getattr(self,'browser_access_serialized',False)
+                        and row['resource'] == 'browser' and db.execute(
+                        "SELECT 1 FROM wf_resource_locks WHERE resource LIKE 'browser:apply-%'").fetchone()):
                     continue
                 token = str(uuid.uuid4())
                 deadline = _lease_deadline(lease_seconds)
@@ -165,6 +197,8 @@ class TaskMixin:
                 if row["resource"] is not None:
                     db.execute("INSERT INTO wf_resource_locks(resource,task_id,lease_token) VALUES (?,?,?)",
                                (row["resource"], row["id"], token))
+                if row['resource'] == 'browser':
+                    db.execute("DELETE FROM wf_settings WHERE key='browser_resume_task' AND value=?", (row['id'],))
                 return self.task(self._task(db, row["id"]))
         return None
 
@@ -181,7 +215,8 @@ class TaskMixin:
         dedupe_key = "preflight:" + probe_id
         with self.transaction(write=True) as db:
             self._recover_expired_tasks(db)
-            if db.execute("SELECT 1 FROM wf_resource_locks WHERE resource='browser'").fetchone():
+            if db.execute("SELECT 1 FROM wf_resource_locks WHERE resource='browser'" +
+                    ('' if getattr(self,'browser_access_serialized',False) else " OR resource LIKE 'browser:apply-%'")).fetchone():
                 return None
             # Probe IDs identify one execution, not an automatically replayable
             # command. Retain that distinction after a terminal result as well.
@@ -258,19 +293,43 @@ class TaskMixin:
             self._leased_task(db, task_id, token)
             deadline = _lease_deadline(lease_seconds)
             db.execute("UPDATE wf_tasks SET lease_until=?,updated_at=? WHERE id=?", (deadline, now(), task_id))
+            if db.execute("SELECT 1 FROM sqlite_master WHERE name='wf_apply_slots'").fetchone():
+                changed=db.execute('UPDATE wf_apply_slots SET updated_at=? WHERE task_id=?',(now(),task_id))
+                if changed.rowcount:
+                    self._pool_bump(db)
             return self.task(self._task(db, task_id))
 
-    def checkpoint_task(self, task_id, token, checkpoint):
+    def checkpoint_task(self, task_id, token, checkpoint, *, merge=False):
+        if type(merge) is not bool:
+            raise ReviewError("Checkpoint merge must be a boolean.")
         _json_object(checkpoint, "Checkpoint")
         with self.transaction(write=True) as db:
             row = self._leased_task(db, task_id, token)
             checkpoint = dict(checkpoint)
             previous = json.loads(row["checkpoint"])
+            if merge:
+                checkpoint = {**previous, **checkpoint}
+            # The host owns the provider retry budget, including its initial zero.
+            if ('worker_capacity_failures' in checkpoint and
+                    (type(checkpoint['worker_capacity_failures']) is not int or
+                     checkpoint['worker_capacity_failures'] != previous.get('worker_capacity_failures', 0))):
+                raise ReviewError('A worker cannot change its capacity retry budget.', 409)
+            if 'worker_capacity_failures' in previous:
+                checkpoint['worker_capacity_failures'] = previous['worker_capacity_failures']
+            if ('readiness_recovery_count' in checkpoint and
+                    (type(checkpoint['readiness_recovery_count']) is not int or
+                     checkpoint['readiness_recovery_count'] != previous.get('readiness_recovery_count', 0))):
+                raise ReviewError('A worker cannot change its readiness recovery budget.', 409)
+            if 'readiness_recovery_count' in previous:
+                checkpoint['readiness_recovery_count'] = previous['readiness_recovery_count']
             # Dispatch context is backend-owned. A worker progress checkpoint
             # must neither remove it nor replace it with newer unseen facts.
-            for field in ("rank_input_lease", "rank_company_fingerprints"):
+            for field in ('application_worker_id','pool_session_reset','pool_transport_proof','application_tab_binding'):
+                if field in checkpoint and field not in previous:
+                    raise ReviewError('A worker cannot introduce host-owned application context.',409)
+            for field in ("rank_input_lease", "rank_company_fingerprints", "application_worker_id", "pool_session_reset", "pool_transport_proof", "application_tab_binding"):
                 if field in previous:
-                    if field in checkpoint and checkpoint[field] != previous[field]:
+                    if field in checkpoint and encode(checkpoint[field]) != encode(previous[field]):
                         raise ReviewError("A worker cannot change the dispatched rank context.", 409)
                     checkpoint[field] = previous[field]
             if _submission_started(row) and not checkpoint.get("submission_started"):
@@ -317,6 +376,131 @@ class TaskMixin:
             return self._release_task(db, task_id, "retry_wait" if retry else "failed", error=error,
                                       available_at=available_at if retry else None)
 
+    def schedule_browser_recovery(self, task_id, token, reason):
+        """Retry only a stopped browser call with a host-recognized reason.
+
+        Keep the original task, approval, answers, and checkpoints. The existing
+        failure budget and durable availability time also survive service restart.
+        """
+        if reason not in RECOVERABLE_BROWSER_REASONS:
+            raise ReviewError("This browser blocker does not allow automatic recovery.")
+        with self.transaction(True) as db:
+            row = self._leased_task(db, task_id, token)
+            if not browser_resource(row["resource"]) or row["kind"] not in {"apply", "explore"}:
+                raise ReviewError("Only browser application or exploration work can recover.", 409)
+            if _submission_started(row):
+                return self._release_task(db, task_id, "waiting_for_user", error="submission_unknown")
+            failures = row["failure_count"] + 1
+            retry = failures < row["max_attempts"]
+            delay = min(300, 5 * (2 ** min(6, failures - 1)))
+            available = (datetime.now(timezone.utc) + timedelta(seconds=delay)).isoformat(timespec="microseconds")
+            db.execute("UPDATE wf_tasks SET failure_count=? WHERE id=?", (failures, task_id))
+            result = self._release_task(db, task_id, "retry_wait" if retry else "waiting_for_user", error=reason,
+                                        available_at=available if retry else None)
+            if row["kind"] == "apply":
+                pid = json.loads(row["payload"])["process_id"]
+                if not retry:
+                    db.execute("UPDATE queue SET status='needs_input',updated_at=? WHERE id=?", (now(), pid))
+                    db.execute('UPDATE wf_processes SET block_reason=?,revision=revision+1,updated_at=? WHERE id=?',
+                               (reason, now(), pid))
+                self._process_event(db, pid, "browser_recovery_scheduled" if retry else "browser_recovery_exhausted",
+                                    {"reason": reason, "failure_count": failures,
+                                     "retry_at": available if retry else None}, "orchestrator")
+            return result
+
+    def schedule_worker_capacity_recovery(self, task_id, token):
+        """Bound provider retries separately from application execution failures."""
+        with self.transaction(True) as db:
+            row = self._leased_task(db, task_id, token)
+            if _submission_started(row):
+                return self._release_task(db, task_id, 'waiting_for_user', error='submission_unknown')
+            checkpoint = json.loads(row['checkpoint'])
+            previous = checkpoint.get('worker_capacity_failures', 0)
+            if type(previous) is not int or not 0 <= previous <= 4:
+                raise ReviewError('Invalid worker capacity recovery state.', 409)
+            count = min(previous + 1, 4)
+            checkpoint['worker_capacity_failures'] = count
+            retry = count <= 3
+            available = (datetime.now(timezone.utc) + timedelta(seconds=30 * 2 ** (count - 1))).isoformat(timespec='microseconds')
+            db.execute('UPDATE wf_tasks SET checkpoint=? WHERE id=?', (encode(checkpoint), task_id))
+            result = self._release_task(db, task_id, 'retry_wait' if retry else 'failed',
+                error='model_at_capacity', available_at=available if retry else None)
+            if row['kind'] == 'apply':
+                pid = json.loads(row['payload'])['process_id']
+                self._process_event(db, pid, 'worker_capacity_retry' if retry else 'worker_capacity_exhausted',
+                    {'reason': 'model_at_capacity', 'failure_count': count,
+                     'retry_at': available if retry else None}, 'orchestrator')
+            return result
+
+    def resume_recoverable_task(self, task_id, expected_updated_at, *, reason, evidence_reference,
+                                process_revision=None):
+        """Operator recovery after inspecting an exact parked task's prerequisite.
+
+        This is deliberately not an HTTP command or a text-based classifier.
+        Evidence is an audit reference, not instructions or new authorization.
+        Every resumed browser task still runs the normal readiness check.
+        """
+        if reason not in RECOVERABLE_BROWSER_REASONS | {"saved_profile_reconciled"}:
+            raise ReviewError("Unsupported recovery reason.")
+        text(expected_updated_at, "Expected task update", 100, required=True)
+        text(evidence_reference, "Recovery evidence reference", 2000, required=True)
+        with self.transaction(True) as db:
+            row = self._task(db, task_id)
+            if row["updated_at"] != expected_updated_at:
+                raise ReviewError("Task changed before recovery.", 409, reason="stale_revision")
+            if not browser_resource(row["resource"]) or row["kind"] not in {"apply", "explore"}:
+                raise ReviewError("This task is not eligible for browser recovery.", 409)
+            allowed = ({"posting_changed"} if reason == "saved_profile_reconciled" else
+                       RECOVERABLE_BROWSER_REASONS | {"application_action_required"})
+            if row["error"] not in allowed:
+                raise ReviewError("This task has a different unresolved blocker.", 409)
+            process = None
+            if row["kind"] == "apply":
+                pid = json.loads(row["payload"])["process_id"]
+                process = self._process(db, pid)
+                if type(process_revision) is not int or process["revision"] != process_revision:
+                    raise ReviewError("Application changed before recovery.", 409, reason="stale_revision")
+                if process["submission_status"] not in {"not_started", "preparing"}:
+                    raise ReviewError("Reconcile the submission outcome before recovery.", 409)
+                self._check_application(db, process)
+                if db.execute("""SELECT 1 FROM wf_questions WHERE process_id=? AND superseded=0
+                    AND required=1 AND answer IS NULL""", (pid,)).fetchone():
+                    raise ReviewError("Required application answers are still missing.", 409)
+                if db.execute("SELECT 1 FROM wf_submission_attempts WHERE process_id=?", (pid,)).fetchone():
+                    raise ReviewError("A submission attempt must be reconciled before recovery.", 409)
+            elif reason == "saved_profile_reconciled":
+                raise ReviewError("Profile recovery requires an application task.", 409)
+            result = self._resume_task(db, task_id)
+            if process is not None:
+                stamp = now()
+                db.execute("UPDATE queue SET status='queued',updated_at=? WHERE id=?", (stamp, process["id"]))
+                db.execute("""UPDATE wf_processes SET block_reason=NULL,revision=revision+1,
+                    updated_at=? WHERE id=?""", (stamp, process["id"]))
+                self._process_event(db, process["id"], "recovery_requested",
+                                    {"reason": reason, "evidence_reference": evidence_reference,
+                                     "previous_task_updated_at": expected_updated_at,
+                                     "previous_process_revision": process_revision}, "operator")
+            return result
+
+    def quarantine_task(self, task_id, token, error="browser_work_uncertain"):
+        """Fence uncertain browser work without making its resource available.
+
+        Killing an agent process does not prove that a browser command stopped.
+        Only acknowledge_worker_stopped may clear this resource quarantine.
+        """
+        text(error, "Task error", 8000, required=True)
+        with self.transaction(write=True) as db:
+            row = self._leased_task(db, task_id, token)
+            if row["resource"] is None:
+                raise ReviewError("Only a task with an external resource can be quarantined.", 409)
+            db.execute("UPDATE wf_resource_locks SET quarantined=1 WHERE task_id=? AND lease_token=?",
+                       (task_id, token))
+            reason = "submission_unknown: " + error[:7900] if _submission_started(row) else error
+            db.execute("""UPDATE wf_tasks SET status='waiting_for_user',error=?,failure_count=failure_count+1,
+                lease_token=NULL,lease_owner=NULL,lease_until=NULL,updated_at=? WHERE id=?""",
+                       (reason, now(), task_id))
+            return self.task(self._task(db, task_id))
+
     def _recover_expired_tasks(self, db):
         rows = db.execute("SELECT * FROM wf_tasks WHERE status='running' AND lease_until<=?", (now(),)).fetchall()
         for row in rows:
@@ -353,6 +537,8 @@ class TaskMixin:
 
     def _resume_task(self, db, task_id):
         row = self._task(db, task_id)
+        if row["error"] == "ranked_output_pending":
+            raise ReviewError("Accepted ranking is waiting for its output file; retry export instead.", 409)
         if row["status"] != "waiting_for_user" or row["resource_quarantined"]:
             raise ReviewError("Task cannot resume until its worker has stopped.", 409)
         if _submission_started(row):

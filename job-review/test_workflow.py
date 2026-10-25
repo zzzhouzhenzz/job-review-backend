@@ -17,6 +17,7 @@ class WorkflowTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.path = Path(self.tmp.name) / "workflow.sqlite3"
         self.store = WorkflowStore(self.path)
+        self.store.grant_project_consent({"request_id": "fixture-consent", "policy_version": 1, "accepted": True})
         self.catalog = catalog()
         self.store.import_catalog(self.catalog, "fictional fixture")
 
@@ -176,7 +177,8 @@ class WorkflowTests(unittest.TestCase):
         orchestrator = Orchestrator(self.store, FakeRuntime())
         self.addCleanup(orchestrator.readiness.close)
         orchestrator.readiness.start()
-        self.assertTrue(orchestrator.readiness.wait(2)["ready"])
+        orchestrator.readiness.wait(2)
+        self.assertTrue(orchestrator.readiness.storage_ready)
         orchestrator.run_once()
         process = self.store.processes()[0]
         self.assertEqual("waiting_for_user", process["task_status"])
@@ -198,7 +200,8 @@ class WorkflowTests(unittest.TestCase):
         orchestrator = Orchestrator(self.store, FakeRuntime())
         self.addCleanup(orchestrator.readiness.close)
         orchestrator.readiness.start()
-        self.assertTrue(orchestrator.readiness.wait(2)["ready"])
+        orchestrator.readiness.wait(2)
+        self.assertTrue(orchestrator.readiness.storage_ready)
         with self.assertRaises(OSError):
             orchestrator.run_once()
         self.assertEqual("submission_unknown", self.store.processes()[0]["submission_status"])

@@ -6,8 +6,13 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 from application_flow import APPLICATION_SCHEMA, ApplicationMixin
+from application_pool import ApplicationPoolMixin
 from task_store import TASK_SCHEMA, TaskMixin
 from ranking import validate_ranked_cards
+from ranked_output import RANKED_OUTPUT_SCHEMA, RankedOutputMixin
+from project_consent import CONSENT_SCHEMA, ProjectConsentMixin
+from question_recovery import QUESTION_RECOVERY_SCHEMA
+from unblock_instructions import UNBLOCK_SCHEMA, UnblockInstructionsMixin
 from store import Store, ReviewError, digest, encode, material_hash, now, text, validate_catalog
 
 
@@ -41,17 +46,16 @@ CREATE TABLE IF NOT EXISTS wf_observations (
 CREATE TABLE IF NOT EXISTS wf_reviewed_jobs (
  job_key TEXT PRIMARY KEY REFERENCES jobs(key), material_hash TEXT NOT NULL, decision_id TEXT NOT NULL
 );
-CREATE TABLE IF NOT EXISTS wf_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 """
 
 
 def capabilities():
     return {"api_version": 1, "worker_enabled": False, "worker_status": "not_configured",
-            "explicit_apply": True, "questions": True, "feed_delivery": "poll",
+            "explicit_apply": True, "questions": True, "unblock_instructions": True, "feed_delivery": "poll",
             "question_scopes": ["application"], "remote_access": False}
 
 
-class WorkflowStore(ApplicationMixin, TaskMixin, Store):
+class WorkflowStore(ApplicationPoolMixin, UnblockInstructionsMixin, ProjectConsentMixin, RankedOutputMixin, ApplicationMixin, TaskMixin, Store):
     """Additive schema; legacy saved approvals never become executable tasks."""
 
     def __init__(self, path, *, low_watermark=10, target_cards=30, refill_cooldown=300):
@@ -61,7 +65,8 @@ class WorkflowStore(ApplicationMixin, TaskMixin, Store):
         self.low_watermark, self.target_cards = low_watermark, target_cards
         self.refill_cooldown = refill_cooldown
         with self.connect() as db:
-            db.executescript(TASK_SCHEMA + APPLICATION_SCHEMA + WORKFLOW_SCHEMA)
+            db.executescript(TASK_SCHEMA + APPLICATION_SCHEMA + WORKFLOW_SCHEMA + RANKED_OUTPUT_SCHEMA + CONSENT_SCHEMA + QUESTION_RECOVERY_SCHEMA + UNBLOCK_SCHEMA)
+        self.initialize_application_pool()
 
     @staticmethod
     def _keys(value, label="Excluded job keys"):
@@ -151,6 +156,7 @@ class WorkflowStore(ApplicationMixin, TaskMixin, Store):
     def _publish_cards(self, db):
         eligible = {j["key"]: j for j in self._eligible(db)}
         companies = {r["id"]: self.company(r) for r in db.execute("SELECT * FROM companies")}
+        pending_outputs = self._pending_rank_card_ids(db)
         reserved = set()
         for card in db.execute("SELECT * FROM wf_cards WHERE status='ready' ORDER BY created_at,id").fetchall():
             jobs = json.loads(card["jobs"])
@@ -162,6 +168,8 @@ class WorkflowStore(ApplicationMixin, TaskMixin, Store):
             else:
                 self._stale_card(db, card, eligible)
         for card in db.execute("SELECT c.*,x.content,x.company_fingerprint FROM wf_cards c JOIN wf_card_content x ON x.card_id=c.id WHERE c.status='prepared' ORDER BY c.created_at,c.id").fetchall():
+            if card["id"] in pending_outputs:
+                continue
             jobs = json.loads(card["jobs"])
             company = companies[card["company_id"]]
             valid = (not company["excluded"] and self._company_fingerprint(company) == card["company_fingerprint"]
@@ -468,7 +476,7 @@ class WorkflowStore(ApplicationMixin, TaskMixin, Store):
                 if key in eligible and eligible[key]["revision"] == candidate["revision"]:
                     db.execute("INSERT INTO wf_selection VALUES (?,?,?,?,1) ON CONFLICT(job_key) DO UPDATE SET revision=excluded.revision,selected=excluded.selected,reason=excluded.reason,evaluated=1",
                                (key, candidate["revision"], int(key in selected), selected.get(key, "Not selected by this ranking.")))
-            card_ids = []
+            card_ids, output_cards = [], []
             for card in cards:
                 cid = card["company_id"]
                 company = self.company(self._row(db, "companies", "id", cid))
@@ -479,10 +487,9 @@ class WorkflowStore(ApplicationMixin, TaskMixin, Store):
                 db.execute("INSERT INTO wf_card_content VALUES (?,?,?)",
                            (card_id, encode(card["content"]), self._company_fingerprint(company)))
                 card_ids.append(card_id)
-            self._release_task(db, task_id, "succeeded", result={"selected": list(selected), "card_ids": card_ids})
-            self._publish_cards(db)
-            # A user request tries the remaining catalog before one bounded source crawl.
-            next_id = None
-            if not selected and not payload.get("after_explore"):
-                next_id = self._enqueue_task(db, "explore", {**payload, "candidates": []}, task["dedupe_key"], resource="browser")
-            return {"task_id": task_id, "next_task_id": next_id, "selected_jobs": len(selected), "card_ids": card_ids}
+                output_cards.append({"id": card_id, "revision": revision, "company": company,
+                                     "jobs": card["jobs"], "content": card["content"]})
+            receipt = {"task_id": task_id, "next_task_id": None, "selected_jobs": len(selected),
+                       "card_ids": card_ids, "artifact_status": "pending"}
+            self._queue_ranked_output(db, task, output_cards, receipt)
+        return self.repair_ranked_outputs(task_id)[0]

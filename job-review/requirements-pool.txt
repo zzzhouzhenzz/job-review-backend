@@ -1,0 +1,2 @@
+# Explicit dependency for the approved answer snapshot hash. No fallback algorithm.
+blake3==1.0.10

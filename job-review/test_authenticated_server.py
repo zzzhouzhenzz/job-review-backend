@@ -92,7 +92,7 @@ class AuthenticatedServerTests(unittest.TestCase):
         self.server.store.state = Mock(side_effect=AssertionError("Authentication must run first"))
         self.server.store.feed = Mock(side_effect=AssertionError("Authentication must run first"))
         for path in ("/api/v1/health", "/api/v1/capabilities", "/api/v1/feed", "/api/v1/questions",
-                     "/api/v1/processes", "/api/v1/tasks", "/api/state", "/api/export", "/", "/app.js", "/unknown"):
+                     "/api/v1/processes", "/api/v1/tasks", "/api/v1/project-consent", "/api/state", "/api/export", "/", "/app.js", "/unknown"):
             for credential in (None, "Bearer " + "x" * 43):
                 with self.subTest(path=path, credential=credential is not None):
                     status, headers, body = self.request(path, headers={"Authorization": credential})
@@ -124,11 +124,39 @@ class AuthenticatedServerTests(unittest.TestCase):
 
     def test_unauthorized_commands_never_execute_or_save(self):
         for path, method in (("/api/v1/decisions", "receive_decision"), ("/api/v1/answers", "answer_questions"),
+                             ("/api/v1/project-consent", "grant_project_consent"),
                              ("/api/v1/tasks/cancel", "cancel_task_command"), ("/api/card", "review_card")):
             operation = Mock(side_effect=AssertionError("No unauthorized mutation"))
             with patch.object(self.server.store, method, operation):
                 self.assertEqual(401, self.request(path, {}, headers={"Authorization": None})[0])
                 operation.assert_not_called()
+
+    def test_project_consent_requires_authenticated_origin_session_and_survives_restart(self):
+        route = "/api/v1/project-consent"
+        payload = {"request_id": "fictional-consent", "policy_version": 1, "accepted": True}
+        first = self.request(route)[2]
+        self.assertFalse(first["project_consent"]["granted"])
+        for headers in ({"Origin": None}, {"Origin": "https://other.example.ts.net"},
+                        {"X-Review-Token": "wrong"}, {"Host": "other.example.ts.net"}):
+            self.assertEqual(403, self.request(route, payload, headers=headers)[0])
+        self.assertFalse(self.server.store.project_consent()["granted"])
+        self.assertEqual(400, self.request(route, {**payload, "scopes": ["submit"]})[0])
+        stale = self.request(route, {**payload, "policy_version": 2})
+        self.assertEqual(409, stale[0])
+        self.assertEqual("consent_policy_changed", stale[2]["error"]["reason"])
+        status, _, receipt = self.request(route, payload)
+        self.assertEqual(200, status)
+        self.assertEqual("accepted", receipt["status"])
+        self.assertTrue(receipt["project_consent"]["granted"])
+        old_session = self.server.token
+        self.stop()
+        self.start()
+        self.assertEqual(403, self.request(route, payload, headers={"X-Review-Token": old_session})[0])
+        replay = self.request(route, payload)[2]
+        self.assertEqual({k: v for k, v in receipt.items() if k != "token"},
+                         {k: v for k, v in replay.items() if k != "token"})
+        self.assertEqual(receipt["project_consent"], self.request(route)[2]["project_consent"])
+        self.assertEqual([], self.server.store.processes())
 
     def test_exact_origin_session_token_host_and_single_headers_required(self):
         payload = self.decision()

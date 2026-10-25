@@ -147,14 +147,18 @@ class ApplicationTests(unittest.TestCase):
         resumed = self.store.lease_task("worker", ["apply"])
         self.store.start_application(pid, resumed["lease_token"])
         self.store.ask_questions(pid, resumed["lease_token"], "form-v2", [
-            {"id": "q2", "text": "Changed question", "type": "text", "required": True}])
+            {"id": "q2", "text": "Changed question", "type": "text", "required": True}],
+            preserve_answer_ids=["q1"])
         questions = self.store.questions()
-        self.assertEqual([q["id"] for q in questions], ["q2"])
-        self.assertIsNone(questions[0]["answer"])
+        self.assertEqual([q["id"] for q in questions], ["q1", "q2"])
+        self.assertEqual(questions[0]["answer"], "Confirmed answer")
+        self.assertEqual(questions[0]["form_version"], "form-v2")
+        self.assertIsNone(questions[1]["answer"])
         with self.store.transaction() as db:
             old = db.execute("SELECT * FROM wf_questions WHERE id='q1'").fetchone()
             self.assertEqual(json.loads(old["answer"]), "Confirmed answer")
-            self.assertEqual(old["superseded"], 1)
+            self.assertEqual(old["superseded"], 0)
+            self.assertEqual(old["revision"], 2)
 
     def test_multi_choice_validation_does_not_infer_answers(self):
         pid, task = self.start()

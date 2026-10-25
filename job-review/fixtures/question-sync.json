@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "revision": "fictional-envelope-digest",
+  "complete": true,
+  "next_cursor": null,
+  "token": "fictional-review-token",
+  "question_sync": {
+    "sync": {
+      "state": "ready",
+      "revision": 15,
+      "pool_revision": 4
+    },
+    "shared_questions": [
+      {
+        "id": "shared-authorization",
+        "text": "Are you authorized to work in the United States?",
+        "type": "single_choice",
+        "choices": [
+          {
+            "id": "yes-0",
+            "label": "Yes"
+          },
+          {
+            "id": "no-0",
+            "label": "No"
+          }
+        ],
+        "required": true,
+        "scope": {
+          "kind": "personal",
+          "key": ""
+        },
+        "status": "answered",
+        "answer": "yes-0",
+        "answer_revision": 1,
+        "answered_at": "2026-10-25T12:00:00+00:00",
+        "binding_ids": [
+          "q0",
+          "q1"
+        ]
+      }
+    ],
+    "questions": [
+      {
+        "id": "q0",
+        "process_id": "process-0",
+        "form_version": "form-0",
+        "revision": 2,
+        "text": "Are you authorized to work in the United States?",
+        "type": "single_choice",
+        "choices": [
+          {
+            "id": "yes-0",
+            "label": "Yes"
+          },
+          {
+            "id": "no-0",
+            "label": "No"
+          }
+        ],
+        "required": true,
+        "scope": "application",
+        "reason": "Required field",
+        "answer": "yes-0",
+        "answered_at": "2026-10-25T12:00:00+00:00",
+        "created_at": "2026-10-25T11:00:00+00:00",
+        "updated_at": "2026-10-25T12:00:00+00:00",
+        "pool_question_id": "shared-authorization",
+        "pool_revision": 4,
+        "pool_answer_revision": 1
+      },
+      {
+        "id": "q1",
+        "process_id": "process-1",
+        "form_version": "form-1",
+        "revision": 1,
+        "text": "Are you authorized to work in the United States?",
+        "type": "single_choice",
+        "choices": [
+          {
+            "id": "yes-1",
+            "label": "Yes"
+          },
+          {
+            "id": "no-1",
+            "label": "No"
+          }
+        ],
+        "required": true,
+        "scope": "application",
+        "reason": "Required field",
+        "answer": "yes-1",
+        "answered_at": "2026-10-25T12:00:00+00:00",
+        "created_at": "2026-10-25T11:00:00+00:00",
+        "updated_at": "2026-10-25T11:00:00+00:00",
+        "pool_question_id": "shared-authorization",
+        "pool_revision": 4,
+        "pool_answer_revision": 1
+      }
+    ],
+    "processes": [
+      {
+        "id": "process-0",
+        "job_key": "fictional:0",
+        "task_id": "task-0",
+        "decision_id": "decision-0",
+        "snapshot": {
+          "company_name": "Fictional Employer",
+          "title": "Fictional Engineer"
+        },
+        "submission_status": "preparing",
+        "recruiting_status": "awaiting_response",
+        "revision": 3,
+        "receipt": null,
+        "block_reason": null,
+        "form_version": "form-0",
+        "task_status": "queued",
+        "created_at": "2026-10-25T11:00:00+00:00",
+        "updated_at": "2026-10-25T12:00:00+00:00",
+        "events": []
+      },
+      {
+        "id": "process-1",
+        "job_key": "fictional:1",
+        "task_id": "task-1",
+        "decision_id": "decision-1",
+        "snapshot": {
+          "company_name": "Fictional Employer",
+          "title": "Fictional Engineer"
+        },
+        "submission_status": "preparing",
+        "recruiting_status": "awaiting_response",
+        "revision": 2,
+        "receipt": null,
+        "block_reason": "tool_approval_required",
+        "form_version": "form-1",
+        "task_status": "waiting_for_user",
+        "created_at": "2026-10-25T11:00:00+00:00",
+        "updated_at": "2026-10-25T11:00:00+00:00",
+        "events": []
+      }
+    ],
+    "historical_unlinked_question_ids": []
+  }
+}

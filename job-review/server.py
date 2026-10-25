@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Serve the continuous local job review. No applications are sent."""
+"""Serve the continuous local job review with optional explicit worker runtime."""
 from __future__ import annotations
 
 import argparse
@@ -10,7 +10,7 @@ import sqlite3
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from device_access import DeviceAccess
 from orchestrator import Orchestrator
@@ -29,7 +29,7 @@ class ReviewServer(ThreadingHTTPServer):
     daemon_threads = True
 
     def __init__(self, address, db_path=DEFAULT_DB, root=ROOT, *, runtime=None, readiness_options=None,
-                 access_config=None):
+                 access_config=None, run_workers=False, run_scheduling=True):
         if address[0] != "127.0.0.1":
             raise ValueError("The review server must bind to 127.0.0.1.")
         # Validate access configuration before opening a database or a listener.
@@ -39,28 +39,44 @@ class ReviewServer(ThreadingHTTPServer):
         super().__init__(address, Handler)
         try:
             self.store = WorkflowStore(db_path)
-            self.orchestrator = Orchestrator(self.store, runtime, readiness_options=readiness_options)
+            self.run_scheduling=run_scheduling
+            self.orchestrator = Orchestrator(self.store, runtime, readiness_options=readiness_options,
+                                             schedule_answer_reviews=run_workers)
             self._last_tick = time.monotonic()
             self.root = Path(root)
             self.token = secrets.token_urlsafe(32)
-            self.orchestrator.readiness.start()
+            if run_scheduling:
+                self.orchestrator.readiness.start()
+            self.worker_runner = None
+            if run_workers and self.orchestrator.runtime.enabled:
+                from worker_runner import WorkerRunner
+                self.worker_runner = WorkerRunner(self.orchestrator)
+                self.worker_runner.start()
         except BaseException:
             self.server_close()
             raise
 
     def worker_capabilities(self):
         return {**capabilities(), "worker_enabled": bool(self.orchestrator.runtime.enabled),
+                "worker_kinds": list(getattr(self.orchestrator.runtime, "supported_kinds", [])),
                 "worker_status": self.orchestrator.readiness.snapshot()["status"],
-                "remote_access": self.access is not None}
+                "remote_access": self.access is not None, "application_workflow": True,
+                "question_sync": getattr(self.store, "question_pool", None) is not None}
 
     def server_close(self):
         # HTTPServer also calls this if binding fails during construction.
+        if getattr(self, "worker_runner", None) is not None:
+            # Runtime cancellation precedes the join. Do not release a supervisor
+            # database lock while a worker can still commit or use Chrome.
+            self.worker_runner.stop(timeout=None)
         if hasattr(self, "orchestrator"):
             self.orchestrator.readiness.close()
         super().server_close()
 
     def service_actions(self):
-        """Schedule durable work; the default runtime cannot execute it."""
+        """Keep scheduling independent of long-running Codex calls."""
+        if not self.run_scheduling:
+            return
         self.orchestrator.readiness.poll()
         current = time.monotonic()
         if current - self._last_tick < 5:
@@ -139,23 +155,51 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = urlsplit(self.path).path
         v1 = path.startswith("/api/v1/")
-        if not self.authenticated():
+        if (path == "/api/v1/project-consent" and self.server.access is None) or not self.authenticated():
             return self.error(401, "A valid device credential is required.", v1=v1)
         if not self.valid_host():
             return self.error(403, "Invalid host.", v1=v1)
         try:
             if path == "/api/v1/capabilities":
                 return self.v1_read({"capabilities": self.server.worker_capabilities()})
+            if path == "/api/v1/question-sync":
+                from question_sync import snapshot
+                return self.v1_read({"question_sync": snapshot(self.server.store)})
+            if path == "/api/v1/application-workflow":
+                return self.v1_read({"application_workflow": self.server.store.application_workflow()})
             if path == "/api/v1/health":
                 return self.v1_read({"health": self.server.orchestrator.readiness.snapshot()})
+            if path == "/api/v1/project-consent":
+                return self.v1_read({"project_consent": self.server.store.project_consent()})
             if path == "/api/v1/feed":
                 feed = self.server.store.feed()
                 feed["capabilities"] = self.server.worker_capabilities()
                 return self.v1_read(feed)
             if path == "/api/v1/processes":
-                return self.v1_read({"processes": self.server.store.processes()})
+                pool=getattr(self.server.store,'question_pool',None)
+                if pool is not None:
+                    with pool.hold('recovery','processes-read',timeout_seconds=1):
+                        from pool_application import recover_locked
+                        recover_locked(self.server.store)
+                        processes=self.server.store.processes()
+                else:
+                    processes=self.server.store.processes()
+                return self.v1_read({"processes": processes})
             if path == "/api/v1/questions":
-                return self.v1_read({"questions": self.server.store.questions()})
+                pool=getattr(self.server.store,'question_pool',None)
+                if pool is not None:
+                    with pool.hold('recovery','questions-read',timeout_seconds=1):
+                        from pool_application import recover_locked
+                        recover_locked(self.server.store)
+                        questions=self.server.store.questions()
+                else:
+                    questions=self.server.store.questions()
+                return self.v1_read({"questions": questions})
+            if path == "/api/v1/unblock-instructions":
+                query = parse_qs(urlsplit(self.path).query, keep_blank_values=True)
+                if set(query) != {"task_id"} or len(query['task_id']) != 1:
+                    raise ReviewError('Provide exactly one task_id query parameter.')
+                return self.v1_read(self.server.store.unblock_instructions(query['task_id'][0]))
             if path == "/api/v1/tasks":
                 return self.v1_read({"tasks": [{key: task.get(key) for key in PUBLIC_TASK_FIELDS}
                                                for task in self.server.store.tasks()]})
@@ -186,7 +230,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         path = urlsplit(self.path).path
         v1 = path.startswith("/api/v1/")
-        if not self.authenticated():
+        if (path == "/api/v1/project-consent" and self.server.access is None) or not self.authenticated():
             return self.error(401, "A valid device credential is required.", v1=v1)
         if not self.valid_host():
             return self.error(403, "Invalid host.", v1=v1)
@@ -233,6 +277,8 @@ class Handler(BaseHTTPRequestHandler):
     def v1_command(self, path):
         routes = {"/api/v1/decisions": self.server.store.receive_decision,
                   "/api/v1/answers": self.server.store.answer_questions,
+                  "/api/v1/unblock-instructions": self.server.store.save_unblock_instruction,
+                  "/api/v1/project-consent": self.server.store.grant_project_consent,
                   "/api/v1/tasks/cancel": self.server.store.cancel_task_command}
         operation = routes.get(path)
         if operation is None:
@@ -281,8 +327,15 @@ def main():
     parser.add_argument("--db", type=Path, default=DEFAULT_DB)
     parser.add_argument("--access-config", type=Path,
                         help="Private device access configuration. Requires bearer authentication for all requests; use behind HTTPS.")
+    parser.add_argument("--runtime-config", type=Path,
+                        help="Explicit Codex worker configuration. Omit to keep execution disabled.")
     args = parser.parse_args()
-    server = ReviewServer(("127.0.0.1", args.port), db_path=args.db, access_config=args.access_config)
+    runtime = None
+    if args.runtime_config is not None:
+        from codex_runtime import load_runtime
+        runtime = load_runtime(args.runtime_config)
+    server = ReviewServer(("127.0.0.1", args.port), db_path=args.db, access_config=args.access_config,
+                          runtime=runtime, run_workers=runtime is not None)
     print(f"Job review: http://127.0.0.1:{server.server_port}", flush=True)
     print(f"State: {args.db.resolve()}", flush=True)
     if server.access is not None:

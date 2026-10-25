@@ -72,6 +72,12 @@ class VersionedServerTests(unittest.TestCase):
         self.assertEqual(body["capabilities"]["worker_status"], "not_configured")
         self.assertEqual(self.request("GET", "/api/v1/capabilities")[1], body)
 
+    def test_project_consent_is_unavailable_without_device_auth_configuration(self):
+        payload = {"request_id": "no-auth", "policy_version": 1, "accepted": True}
+        self.assert_error(self.request("GET", "/api/v1/project-consent"), 401, "unauthorized")
+        self.assert_error(self.request("POST", "/api/v1/project-consent", payload), 401, "unauthorized")
+        self.assertFalse(self.server.store.project_consent()["granted"])
+
     def test_auth_failure_uses_v1_error_and_never_invokes_command(self):
         operation = Mock()
         self.server.store.receive_decision = operation

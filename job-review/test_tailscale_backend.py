@@ -14,7 +14,8 @@ import tempfile
 import threading
 import time
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+from types import SimpleNamespace
 
 import tailscale_backend
 from device_stack import database_lock
@@ -134,6 +135,45 @@ class TailscaleBackendTests(unittest.TestCase):
                     self.fail("Concurrent process acquired the DB")
         self.assertFalse(backend.thread.is_alive())
         self.assert_released()
+
+    def test_no_workers_loads_shared_api_without_scheduler_or_native_work(self):
+        runtime=SimpleNamespace(enabled=True,question_pool_enabled=True,
+            supported_kinds=('apply',),application_pool_size=3,transport=SimpleNamespace(),
+            pool_configuration_identity=lambda:{'application_pool_size':3,'supported_kinds':['apply']},
+            close=Mock(),prepare_browser=Mock(side_effect=AssertionError('Browser must not run')),
+            apply=Mock(side_effect=AssertionError('Application must not run')),
+            reuse_pending_answers=Mock(),answers_changed=Mock())
+        config=BackendConfig(self.database,self.access,self.credential,self.port,
+                             self.root/'fictional-runtime.json',True)
+        with patch('codex_runtime.load_runtime',return_value=runtime) as load, \
+                patch('readiness.ReadinessMonitor.start') as start, \
+                patch('readiness.ReadinessMonitor.poll') as poll, \
+                patch('orchestrator.Orchestrator.tick') as tick, \
+                patch('worker_runner.WorkerRunner.start') as workers:
+            with running_backend(config) as backend:
+                load.assert_called_once_with(config.runtime_config)
+                self.assertIsNone(backend.server.worker_runner)
+                self.assertIsNotNone(backend.server.store.question_pool)
+                backend.server._last_tick=0
+                backend.server.service_actions()
+                headers={'Authorization':'Bearer '+self.token}
+                code,body=self.request(headers=headers)
+                self.assertEqual(200,code)
+                self.assertEqual((False,'paused'),(body['capabilities']['worker_enabled'],body['capabilities']['worker_status']))
+                self.assertTrue(body['capabilities']['application_workflow'])
+                self.assertEqual(200,self.request(path='/api/v1/application-workflow',headers=headers)[0])
+                for callback in (start,poll,tick,workers,runtime.prepare_browser,runtime.apply,runtime.reuse_pending_answers):
+                    callback.assert_not_called()
+        runtime.close.assert_called_once()
+        self.assert_released()
+
+    def test_no_workers_cli_option_is_explicit_and_default_remains_enabled(self):
+        self.assertFalse(self.config.no_workers)
+        args=['check','--db',str(self.database),'--access-config',str(self.access),
+              '--credential-file',str(self.credential),'--port',str(self.port),'--no-workers']
+        with patch('tailscale_backend.check',return_value=SimpleNamespace(access=SimpleNamespace(public_origin=self.origin))) as checked:
+            tailscale_backend.main(args)
+        self.assertTrue(checked.call_args.args[0].no_workers)
 
     def test_wal_approval_and_original_schema_are_in_verified_backup_before_migration(self):
         connection = self.seed_approval()

@@ -1,21 +1,33 @@
 # Continuous job review
 
-Review one company at a time. Stop when you want. Each card decision saves before the next card opens. The local queue records approved jobs and research requests. This app does not send applications or contact employers.
+Current ownership, deployment state, and remaining work: [Backend status](BACKEND_STATUS.md).
+
+Review one company at a time. Stop when you want. Each card decision saves before the next card opens. The local queue records approved jobs and research requests. The legacy web UI records manual work. The v1 backend can execute explicitly approved work only when its Codex runtime is configured.
 
 ## Backend workflow v1
 
-The backend now has durable task scheduling, explicit Apply decisions, feed refill,
-application tracking, and structured questions and answers. The agent, LLM, and
-Chrome interfaces are intentionally unimplemented. The default worker reports
-`not_configured` and leaves tasks queued without executing them.
+The backend has durable task scheduling, explicit Apply decisions, feed refill,
+application tracking, and structured questions and answers. `CodexRuntime` and
+`CodexTransport` implement the Explorer, Ranker, and Application Agent adapters.
+Execution requires an explicit `--runtime-config` path. Without it, the worker
+reports `not_configured` and leaves tasks queued. Implemented adapters do not
+establish that a production runtime is enabled or that a live pipeline has passed.
 
 The [v1 contract](CONTRACT_V1.md) defines the iOS endpoints, data types, retry rules,
 architecture, and worker boundary. [HTTP fixtures](fixtures/v1-http.json) contain
 fictional request and response examples. A [ranked card fixture](fixtures/ranked-flashcard.json)
 shows the ranker's text and job order. [Health fixtures](fixtures/health.json)
-show the startup readiness response. [Device access fixtures](fixtures/auth.json)
+show disabled, idle, ready, and blocked browser health responses. [Device access fixtures](fixtures/auth.json)
 show an authentication failure and a successful capability read. The iOS app is developed separately in
 `job-review-ios/`; these backend changes do not switch its transport automatically.
+
+Blocked tasks can receive user guidance through the capability-gated
+[unblock instruction API](UNBLOCK_INSTRUCTIONS_CONTRACT.md). Clients keep the
+exact task and process revisions, saved history, and retry receipt. Eligible
+stopped applications can retry preparation with the guidance under their existing
+approval and retry budget. Other eligible blockers schedule a read-only check.
+Missing required answers, uncertain submissions and quarantined work retain their
+gates. Instruction text cannot supply legal consent or bypass a tool permission.
 
 The ranker selects and orders up to three jobs per company. It also writes the
 card summary and each job's selection reason, work, fit, and gap. The backend
@@ -27,8 +39,11 @@ Generated text is separate from the original posting data. A published card
 keeps its text and order when new rankings arrive. If a selected posting changes,
 the whole ranked group becomes stale; its old summary is not reused for a
 smaller group. Existing or curated cards have `content: null` and keep their
-source text. Actual ranking and text generation remain unimplemented behind
-`AgentRuntime.rank(context, lease)`.
+source text. `CodexRuntime.rank(context, lease)` reads stored candidates and
+confirmed applicant evidence without Chrome. After validation, SQLite records
+the accepted result and a durable export request. The backend writes a private
+`ranked-output/<task-id>.json` file beside the database before it publishes the
+new cards. A failed file write retries export without repeating the model call.
 
 The existing web UI and unversioned endpoints retain their manual behavior.
 Approve saves a choice. Queue records a manual handoff. Neither action creates an
@@ -40,31 +55,69 @@ fewer than 10 company cards remain, with a target of 30 cards and a five-minute
 cooldown. One active refill is allowed. New agent results need ranking before
 publication. Feed delivery uses polling; APNs is not included.
 
-The physical iPhone connection must use HTTPS and authenticated device access.
-The optional device access mode requires a bearer credential on every request.
-The backend still binds only to loopback HTTP. `device_stack.py` supervises the
-backend and Caddy TLS gateway together. Deployment and the physical iPhone check
-remain pending.
+The physical iPhone connection uses HTTPS and authenticated device access. The
+backend binds only to loopback HTTP. `tailscale_backend.py` supports private
+Tailscale Serve access; `device_stack.py` retains the Caddy gateway option.
+Keep deployment and device verification records separate from adapter tests.
 
-At startup, the server starts a background readiness check after it binds its
-HTTP port. `GET /api/v1/health` reports storage health, Chrome attachment,
-LinkedIn sign-in, a full job posting read, and the Explorer, Ranker, and
-Application Agent sessions. The API remains available while these checks run or
-fail. HTTP 200 means the API answered; only `health.ready: true` permits worker
-dispatch. Saved decisions and answers can wait safely while workers are blocked.
+At startup, the server checks local storage in a background thread. It does not
+open Chrome or start an agent health probe. An enabled runtime reports `idle`,
+with browser checks `on_demand`, until a browser task needs access. Rank work
+requires healthy storage and runs without Chrome.
 
-The actual Chrome and agent probes are part of the unimplemented
-`AgentRuntime.preflight(probe_id, lease)` interface. The default reports
-`not_configured`; it does not claim that LinkedIn or any agent is ready. A future
-adapter must read a current posting through the attached, signed-in Chrome
-session and get a fresh response from each dedicated agent session. Stored
-session IDs alone do not pass these checks.
+Before each Explore or Apply task, the worker acquires the durable `browser`
+resource and calls `prepare_browser(task, lease)`. The runtime reuses an open
+LinkedIn tab or opens one in the existing Chrome profile. It confirms current
+sign-in from the page and hands the exact tab to the task. The health module
+distinguishes stopped, recoverable tab/session/attachment errors from sign-in,
+CAPTCHA and permission failures. Recoverable errors use durable backoff and check
+readiness again under the next task lease. No login is automated.
 
-A check has a 30-second deadline. A successful result is valid for five minutes.
-Failed checks can retry after 30 seconds, and expired results need a new check.
-The readiness probe uses the same durable browser lock as application and
-exploration work. A timed-out probe cannot release that lock while it may still
-be running. Restarting the server does not reuse a previous ready result.
+The Mac dashboard presents a one-time **Agree** dialog for project browser and
+resume access. The backend stores that grant in `wf_project_consent`, with its
+fixed policy version, scopes, source and timestamp. It persists across app and
+service restarts. Until it exists, Explore and Apply tasks stay queued without
+acquiring a browser lease or spending attempts. Rank and local work can continue.
+The next worker poll resumes eligible queued browser work after agreement.
+
+The grant permits reading LinkedIn, company websites and official employer ATS
+job/application pages through the existing Chrome profile. It also permits upload
+of the configured approved resume for explicitly approved jobs. Each browser turn
+receives this recorded consent from the host. It must not ask for the same project
+consent again. Exact-job approval, final submission checks, employer legal
+acknowledgments, sign-in/CAPTCHA, and Chrome/OS/tool permission controls remain
+separate. An external permission denial is still a blocker; this app cannot grant
+or bypass that permission.
+
+For an existing installation whose user has already explicitly granted this scope,
+an operator can record that instruction without another dialog. First let the
+backend supervisor complete its normal backed-up schema migration. Then run:
+
+```sh
+python3 job-review/project_consent.py --db /absolute/path/review.sqlite3 \
+  --request-id stable-consent-import-id --source-reference chat-id-and-message-date
+```
+
+This helper requires the existing migrated database. It writes only a consent
+record and its idempotent command receipt, with `source: "user_chat"`. It does not
+start workers, edit the applicant profile, resume blocked tasks, or contact an
+employer. The source reference must contain no credentials or private answer text.
+Record a grant only when that referenced user instruction explicitly covers the
+policy. The authenticated API is described in [the v1 contract](CONTRACT_V1.md).
+
+The HTTP API stays available while agents work. `worker_runner.py` has separate
+discovery (`explore`, `rank`) and application threads. The new application pool
+uses three durable workers with separate native sessions and browser leases.
+A paused application retains its worker while the other workers continue.
+Discovery's global browser lease waits for active application browser leases;
+Rank can proceed while applications use Chrome. The legacy single-worker mode
+remains available. The [pool contract](APPLY_POOL_CONTRACT.md) defines activation,
+the live workflow endpoint, cross-device question state, and the Chrome handoff
+verification gate. The [cutover plan](APPLY_POOL_SMOKE_PLAN.md) defines the
+authorized rollout; source implementation does not establish deployment.
+Every browser task checks access again. A five-minute health observation is not
+permission to skip that check. Unknown browser completion keeps the resource
+quarantined until an operator confirms that the old work stopped.
 
 To check scheduling against a disposable database:
 
@@ -97,11 +150,11 @@ Open <http://127.0.0.1:8766>. The database is `job-review/state/review.sqlite3`.
 
 ## iPhone access away from home
 
-`device_stack.py` starts and supervises the authenticated backend and Caddy TLS
-gateway as one foreground service. Remote deployment is not complete. No
-production domain, certificate, or device credential has been provisioned, and
-physical iPhone access remains unverified. The existing local mode is unchanged.
-`start.py` and the browser UI remain local-only.
+Production uses the authenticated backend behind private Tailscale HTTPS. The
+production domain and device credential are provisioned, and physical iPhone
+Wi-Fi/LTE access is verified. See `workflow.json` and `RUNTIME_VERIFICATION.md`
+for dated evidence. `device_stack.py` retains the alternative Caddy TLS gateway
+and foreground supervisor. `start.py` and the legacy browser UI remain local-only.
 
 ```mermaid
 flowchart LR
@@ -203,8 +256,8 @@ The supervisor starts the authenticated backend and the real Caddy process. It
 checks that an unauthenticated backend request gets 401 and an authenticated
 request reports `remote_access: true`. It then verifies an authenticated request
 through TLS, including certificate trust and hostname, before reporting
-`API and TLS ready`. Worker readiness is reported separately. The agent adapters
-remain unimplemented, so `not_configured` is expected even with a ready API.
+`API and TLS ready`. Worker state is reported separately. This Caddy supervisor does not load a
+Codex runtime, so `not_configured` is expected even with a ready API.
 
 A separate terminal can inspect the running stack without starting another:
 
@@ -317,11 +370,53 @@ before migrations. The backup includes committed WAL data and remains after
 shutdown. An absent database is created only when startup can proceed.
 
 The server binds only to `127.0.0.1`. Startup verifies unauthenticated HTTP 401
-and authenticated HTTP 200 responses. The worker remains disabled because the
-agent adapters are deferred. Up to 16 request connections may run at once;
+and authenticated HTTP 200 responses. Workers stay disabled unless the command
+includes an explicit `--runtime-config` path. Up to 16 request connections may run at once;
 excess connections close, and socket reads have a ten-second idle timeout. The
 API's existing request body limit still applies. Shutdown closes open request
-sockets and waits for accepted requests before releasing the database lock.
+sockets, cancels agent calls, and waits for accepted requests and worker threads
+before releasing the database lock. An interrupted browser call can still leave
+a quarantined task; process termination alone does not prove the browser stopped.
+
+Every start with `--runtime-config` resumes eligible work from the existing
+SQLite queue. No separate resume command is needed. Task IDs, exact-job approvals,
+answers and checkpoints survive the restart. The worker lanes recover local state
+before claiming work, then repeat this check while the server runs.
+
+| Saved state | Behavior after restart |
+| --- | --- |
+| Queued work | Run automatically when its worker and resource are available. |
+| Retry wait | Run at the saved retry time, within the existing failure limit. |
+| Local agent call stopped during shutdown | Queue the same task without consuming its failure limit, once the local process has stopped. |
+| Expired local ranking lease after a crash | Fence the old worker, then retry after the recovery cooldown. |
+| Waiting for answers | Review current saved answers and profile evidence automatically. Keep questions that still need a fact or specific consent. |
+| Waiting for a browser prerequisite | Stay parked. No scheduled browser or model checks. An explicit user action can request a bounded preparation retry when the existing gates allow it. |
+| Waiting for project consent or posting review | Keep the saved wait. A restart does not grant consent or approve changed work. |
+| Interrupted browser work | Keep the browser resource quarantined until the old work is confirmed stopped. |
+| Submission started without a confirmed receipt | Keep `submission_unknown`; reconcile the result before any new submission. |
+| Succeeded, cancelled or failed | Keep the terminal result; do not replay it on startup. |
+
+Restart tests in `test_server_recovery.py` boot the actual backend repeatedly with
+temporary databases and fictional workers. They check saved answers, retry times,
+task identity, old-worker fencing, quarantine and duplicate-submission prevention.
+
+A completed Codex turn that explicitly reports `Selected model is at capacity.`
+before any tool or external action starts gets three durable retries, after 30,
+60 and 120 seconds. This provider retry budget is separate from application
+failures and cannot be cleared by a worker checkpoint. Each retry keeps the same
+task and browser session and repeats the task's readiness check. The health report
+shows `retry_wait`; it does not report a Chrome failure. Mixed errors, incomplete
+event streams, tool activity, quarantine and started submissions do not qualify.
+Exhausted capacity retries leave the task failed. The backend does not change the
+configured model or provider.
+
+Automatic browser-blocker monitoring was removed on October 20, 2026. Parked
+applications do not schedule model observations or periodic native-session probes.
+An explicit eligible instruction can request a preparation retry; normal readiness,
+approval, question and submission gates still apply. Login/challenge instructions
+are saved for manual follow-up. A failed check returns the task to its parked state.
+Existing `wf_browser_waits` rows remain inert historical data. Fresh databases do
+not create that table. Current code neither reads nor updates it.
 
 `status` reads the local authenticated API. It does not prove that Tailscale
 HTTPS, certificate validation, or an iPhone connection works. Verify those
@@ -334,6 +429,217 @@ Focused tests use fictional temporary databases and loopback sockets:
 ```sh
 python3 -B -m unittest discover -s job-review -p 'test_tailscale_backend.py' -v
 ```
+
+## Configure Codex execution
+
+`server.py` and `tailscale_backend.py run` accept `--runtime-config PRIVATE_JSON`.
+The file selects the executable, private run directory, source documents, and
+enabled task kinds. Omit this option to keep execution disabled. `start.py` and
+`device_stack.py` retain their existing behavior and do not load this runtime.
+
+Example configuration with placeholder document and executable paths:
+
+```json
+{
+  "schema_version": 1,
+  "codex_binary": "/absolute/path/to/codex",
+  "run_directory": "../agent-runs",
+  "evidence_files": ["/absolute/path/to/confirmed-resume.md"],
+  "supported_kinds": ["explore", "rank"],
+  "timeout_seconds": 900
+}
+```
+
+Paths resolve relative to the configuration file; absolute paths remain absolute.
+The Codex executable must exist and be executable. Evidence files must exist.
+The run directory must be private (`0700`). Worker input, output, schema, and
+receipt files use `0600`. Keep this configuration private because it identifies
+personal documents. Device bearer credentials do not belong in runtime config.
+
+`explore` and `rank` require at least one confirmed applicant evidence file. To
+enable `apply`, add it to `supported_kinds` and supply existing
+`application_profile`, `resume`, and `application_index` paths, plus readable
+resume text in `evidence_files`. The resume must
+be the approved document. The default kind list, when omitted, contains all
+three kinds, so an explicit list is preferable during staged checks. Unknown
+configuration keys are rejected. `timeout_seconds` defaults to 900.
+
+`browser_transport` selects `exec` (the default) or `app-server`. The latter uses
+the supported bidirectional Codex protocol for browser turns, while rank and
+answer review keep the existing CLI transport. It inherits the configured model,
+effort and approval reviewer. Browser turns keep the read-only shell sandbox.
+The host can answer the exact installed Chrome upload consent form during
+application preparation. It requires standing project consent, a current task
+lease, the approved job's HTTPS origin and an unchanged verified resume. Chrome's
+grant is origin-scoped; the host records a session-only grant and the resume hash
+in the private receipt. It does not claim that Chrome enforces a file-scoped grant.
+Other origins, strict automatic-review requests, authentication, device verification,
+unknown forms, and shell permissions are not accepted by this handler. The handler
+does not modify extension permissions or permission storage.
+
+For an explicit document choice on one application, the private host configuration
+can set `application_resumes` with the exact process ID as its key. Each entry
+contains `path`, `sha256`, `bytes`, `uploaded_filename`, and `source_reference`.
+The host checks the pinned file before preparation and again at the submission
+checkpoint. A missing or changed file stops that application; it does not fall
+back to the global resume. Other applications keep their configured default.
+Agent checkpoints cannot select a different document. The recorded filename is
+an observation to compare with the current form, not proof that an attachment
+still exists or permission to bypass an upload approval.
+
+To load the runtime through the Tailscale supervisor, add this option to its
+existing `run` command:
+
+```sh
+--runtime-config job-review/state/device/runtime.json
+```
+
+Use the already selected database, origin, and credential files. Do not start a
+second supervisor for the same database. Loading this configuration makes
+matching queued tasks eligible for execution; use a disposable database for
+fixture tests and choose task kinds deliberately for live verification.
+
+With `browser_transport: "app-server"` and `browser_session_policy: "shared"`,
+new browser work uses one named Codex conversation across tasks. Readiness,
+exploration, preparation and submission resume its exact private host binding.
+After ten distinct confirmed applications, new work uses the next conversation.
+Attempts, retries and uncertain submissions do not count. Pending applications
+stay on their original conversation until complete. A retired conversation is
+archived only after its drafts have finished and native history matches its
+completed host receipt. Existing per-task draft sessions drain in place. The
+default `per_task` policy remains available for older configurations.
+
+Chrome clears prior handoff marks on each resumed turn. Every shared browser
+turn, including readiness and exploration, must reapply `markHandoff()` to all
+unfinished application drafts already owned by that conversation. The host gives
+the worker the current pending job identities. It must not claim another
+conversation's tabs or act on another job. Fresh task context and stored approvals
+remain authoritative. A global private file lock excludes simultaneous shared
+calls; an uncertain receipt blocks further shared work after a crash. Workers
+cannot spawn helper agents or create more chats. Native model and effort settings
+stay unchanged. An explorer reacquires LinkedIn if its temporary tab was cleaned up.
+Local ranking and evidence review use separate ephemeral agents. The transport uses the read-only filesystem sandbox,
+passes task input on stdin, validates structured output, and renews task leases.
+Browser roles use the existing Chrome profile through the Chrome plugin. They
+do not use a new profile, CDP, cookie extraction, or direct LinkedIn HTTP APIs.
+Rank receives stored postings and local evidence and is instructed not to use
+browser or network tools. Agent output is untrusted until host validation.
+
+Tab IDs from other sessions are hints. A worker tries supported lookup, then can
+open a task-owned tab at the exact approved URL in the same Chrome profile when
+the old tab is explicitly unavailable. It rechecks the draft and attachment.
+It cannot use this recovery for a denied permission or an uncertain submission.
+An unfinished browser-turn receipt stops replay even after server restart.
+
+During preparation, a temporary site error that explicitly requests a refresh
+allows one reload of the same owned draft. All prior actions must have completed
+with known outcomes, and no submission may have started. The worker rechecks the
+job, draft and attachment afterward. A persistent error uses the existing bounded
+retry schedule and releases the browser for other work. After those retries,
+the task waits for a read-only health check. Fresh evidence that the exact blocker
+cleared permits one further execution; earlier failure history remains recorded.
+This recovery does not
+apply to permission denials, login, CAPTCHA, validation errors or uncertain actions.
+
+The production browser transport uses the native app-server approval channel.
+The host can accept a supported resume-upload request when stored project consent,
+the exact job approval, current lease, destination origin, preparation stage and
+resume hash all match. The grant lasts for that worker session. Login, CAPTCHA,
+device verification and unrelated permission requests still require their own
+resolution. The optional `codex exec` transport cannot receive interactive upload
+approval. In either transport, the worker must verify the actual attachment and
+exact requisition before it continues.
+
+Application preparation and submission use separate agent calls. Each preparation
+loads current profile, resume text and application history into a bounded source
+snapshot with line numbers and SHA-256 hashes. Proposed questions receive a
+separate browser-free evidence review before they reach the user. The backend
+validates exact citations, source freshness, question revisions and observed
+choice IDs. It can reuse confirmed facts and draft professional motivation from
+the approved role and resume. Unknown facts and specific legal consent stay pending.
+
+Automatic answers use an internal writer and `wf_answer_evidence` provenance.
+They never overwrite an existing answer or claim to be user input. All saved
+answers retain their IDs and values across later question rounds. Changed source
+snapshots trigger a browser-free check of existing automatic answers before form
+actions. Still-supported values retain their exact wording and receive fresh
+provenance. Conflicting answers stop for review. Actual user replacements remain
+authoritative.
+
+Parked questions are also reviewed automatically in a separate browser-free lane
+when the complete profile/resume/history evidence or question round changes.
+`wf_question_reviews` stores durable review keys, bounded retries and outcomes.
+Unchanged completed reviews survive restart. Only still-missing facts or specific
+consent remain questions. A crash between saving partial answers and recording
+the review receipt can cause one extra review, but cannot overwrite those answers.
+The lane is disabled when workers are disabled and must stop before the backend
+releases its database lock.
+
+Each accepted user answer immediately wakes this lane. If a review is active,
+the backend coalesces answer changes into one follow-up scan of all parked
+questions. A concurrent answer invalidates stale results. Polling remains a
+restart and file-edit fallback, and durable retry limits still apply.
+
+Preparation retains observed questions even when a separate human browser
+blocker remains. Saved-answer reuse can resolve those questions while parked.
+Answers cannot clear the browser blocker or grant a denied operation.
+
+The scheduler also repairs a stale question wait when the current question round
+is complete in the database. It requires current approval, remaining retry budget,
+no browser lock and no submission attempt. An empty question list, partial answers
+or a different blocker cannot clear the wait.
+
+Lost browser leases remain quarantined until explicit operator reconciliation.
+The service no longer polls native sessions to recover interrupted readiness.
+
+An unspecified office cadence can receive a narrow compatibility review against
+an explicit saved work preference. The work mode and every other material field
+must remain unchanged. Source-validated proof is stored in the task checkpoint;
+the original approval snapshot is retained. A pay, location, title, level, work
+mode or other material change still needs review.
+An invalid local compatibility result receives one correction attempt with the
+same source snapshot. Full-line citations remain mandatory. Repeated invalid
+output stops with a technical review failure; it does not ask for an already
+saved preference or replay browser actions.
+
+Every accepted user answer also creates a durable `wf_profile_answers` record and
+`wf_profile_outbox` entry in the same transaction. The backend projects current
+answers into the configured `application_profile` Markdown file, preserving its
+manual content. Records include exact question text, answer labels, source request,
+revision, date, company and application context. SQLite retains correction history.
+Worker-generated answers never become user-confirmed profile facts.
+
+The projection uses a private atomic file replacement and retries failed writes.
+An already accepted answer still returns its original receipt if the file write
+fails. Workers wait for pending profile updates before using the evidence. The
+write transaction checks for pending newer answers before automatic answer saves
+or submission. Source changes during preparation requeue the task without spending
+its failure budget.
+
+Exact reusable questions resolve from saved profile records before a model call.
+Choice labels map to the current form's IDs. Portable facts can cross employers;
+employer history and specific consent keep their context. New user answers can
+also resolve identical questions in other pending applications during scheduling,
+without a browser or model call. Equivalent wording uses the evidence review.
+
+Unanswered questions are saved with revisions and the browser is released while
+the user answers. Before submission, the backend rechecks the approved posting and form,
+then commits `before_submit`. It records success only from a matching observed
+receipt. An unknown result requires reconciliation and cannot auto-submit again.
+
+To review existing parked question rounds, use the bounded operator command below.
+It reads an existing database without migrations and saves a new private plan.
+Inspect that plan before applying it. Applying uses the same revision, approval,
+source and submission guards as the runtime; complete answers queue the same task.
+It does not resolve unrelated sign-in, upload or posting-change blockers.
+
+```sh
+python3 job-review/reconcile_questions.py review --db DATABASE --runtime-config PRIVATE_CONFIG --plan NEW_PRIVATE_PLAN
+python3 job-review/reconcile_questions.py apply --db DATABASE --runtime-config PRIVATE_CONFIG --plan NEW_PRIVATE_PLAN
+```
+
+Unit and fixture tests do not establish production activation or live Chrome,
+LinkedIn, ranking, or employer submission success. Record live checks separately.
 
 ## Review a company
 

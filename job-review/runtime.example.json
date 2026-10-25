@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "codex_binary": "/absolute/path/to/codex",
+  "run_directory": "state/agent-runs",
+  "evidence_files": [
+    "../resume-content-draft.md"
+  ],
+  "application_profile": "../application-profile.md",
+  "resume": "../private/resume.pdf",
+  "application_index": "../private/application-index.json",
+  "supported_kinds": [
+    "explore",
+    "rank",
+    "apply"
+  ],
+  "browser_transport": "app-server",
+  "browser_session_policy": "per_task",
+  "timeout_seconds": 900,
+  "application_pool_size": 3
+}

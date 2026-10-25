@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "revision": "fictional-envelope-revision",
+  "complete": true,
+  "next_cursor": null,
+  "token": "fictional-test-only",
+  "application_workflow": {
+    "revision": 7,
+    "generated_at": "2026-10-23T23:00:00+00:00",
+    "pool_size": 3,
+    "workers": [
+      {
+        "worker_id": "apply-1",
+        "state": "running",
+        "stage": "applying",
+        "process_id": "fictional-process-1",
+        "task_id": "fictional-task-1",
+        "company": "Fictional Company 1",
+        "job_title": "Fictional engineer",
+        "stage_started_at": "2026-10-23T23:00:00+00:00",
+        "updated_at": "2026-10-23T23:00:00+00:00",
+        "question_ids": []
+      },
+      {
+        "worker_id": "apply-2",
+        "state": "paused",
+        "stage": "paused",
+        "process_id": "fictional-process-2",
+        "task_id": "fictional-task-2",
+        "company": "Fictional Company 2",
+        "job_title": "Fictional engineer",
+        "stage_started_at": "2026-10-23T23:00:00+00:00",
+        "updated_at": "2026-10-23T23:00:00+00:00",
+        "question_ids": [
+          "fictional-question-1"
+        ]
+      },
+      {
+        "worker_id": "apply-3",
+        "state": "running",
+        "stage": "waiting_for_lock",
+        "process_id": "fictional-process-3",
+        "task_id": "fictional-task-3",
+        "company": "Fictional Company 3",
+        "job_title": "Fictional engineer",
+        "stage_started_at": "2026-10-23T23:00:00+00:00",
+        "updated_at": "2026-10-23T23:00:00+00:00",
+        "question_ids": []
+      }
+    ],
+    "question_pool": {
+      "pending_count": 1,
+      "answered_count": 4,
+      "revision": 3
+    },
+    "question_lock": {
+      "state": "held",
+      "owner_kind": "answer_handler",
+      "owner_id": "fictional-answer-1",
+      "acquired_at": "2026-10-23T23:00:00+00:00",
+      "waiting_worker_ids": [
+        "apply-3"
+      ]
+    },
+    "answer_file": {
+      "revision": 4,
+      "hash_algorithm": "blake3",
+      "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    "answer_handler": {
+      "stage": "saving_answers",
+      "updated_at": "2026-10-23T23:00:00+00:00"
+    },
+    "browser_access": {
+      "capacity": 1,
+      "policy": "chrome_fifo_v1",
+      "revision": 3,
+      "state": "busy",
+      "owner": {
+        "ticket_id": "fictional-ticket-1",
+        "task_id": "fictional-task-1",
+        "worker_id": "apply-1",
+        "role": "application_prepare",
+        "enqueued_at": "2026-10-23T23:00:00+00:00",
+        "acquired_at": "2026-10-23T23:00:00+00:00",
+        "started_at": "2026-10-23T23:00:00+00:00",
+        "state": "active"
+      },
+      "queue": [],
+      "blocked_by": []
+    }
+  }
+}
