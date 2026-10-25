@@ -1,73 +1,86 @@
-# Job Review backend
+# Job Review
 
-Source-only export for deploying jobswipe on Linux. This repository contains the
-Python backend, static legacy UI, API contracts, tests, and fictional fixtures.
-It does not contain a database, job research, user decisions, credentials,
-browser profiles, macOS service configuration, or platform-specific binaries.
+Source for the Job Review backend, native Mac dashboard, and iOS app. The Mac and
+iOS clients share the `ReviewCore` package and one backend source of truth.
 
-Read [LINUX_SETUP_PROMPT.md](LINUX_SETUP_PROMPT.md) for the deployment task.
-`SOURCE_MANIFEST.json` records the exact source files in this export. The existing
-`job-review/README.md` includes historical Mac deployment instructions; its older
-deployment-status statements are not the current status of either machine.
+This repository contains code, tests, fictional fixtures, and build resources.
+Production databases, answers, applicant documents, credentials, browser profiles,
+native receipts, local signing settings, and deployment history stay outside Git.
 
-## Runtime
+## Application workflow
 
-- Python 3.10 or later is the deployment target. The backend uses the standard
-  library; external TLS/browser/desktop tools are separate dependencies.
-- SQLite holds jobs, decisions, durable commands, tasks, questions, and receipts.
-- `job-review/tailscale_backend.py` supervises the authenticated API on loopback.
-- Tailscale Serve supplies private HTTPS. The Caddy implementation is also
-  included, but no macOS Caddy binary is shipped.
-- Agent, LLM, and Chrome execution adapters remain unimplemented. The default
-  worker reports `not_configured`; it does not apply to employers or crawl jobs.
+Three application workers retain separate tasks, native sessions, and tabs. All
+browser operations enter one durable FIFO queue for a shared Chrome connection.
+A worker waiting for an answer releases Chrome after its browser turn is safely
+complete. When all required answers are present, it joins the queue tail.
+Uncertain browser work stays held until its prior owner is proved stopped.
 
-## Source verification
+The applying worker matches questions against the shared question pool. A shared
+writer lock covers both worker registration and user answers. Pending questions
+and answered questions have Markdown projections. An immutable answered snapshot
+and BLAKE3 manifest let a worker detect new answers after acquiring the lock.
+Answer storage and wakeup checks run in code; a small model step formats new text.
 
-From the repository root:
+`GET /api/v1/question-sync` returns a coherent canonical snapshot for both clients.
+Revision guards reject stale answers. Identical retries are idempotent. Clients
+retain drafts and the last complete snapshot while synchronization is incomplete.
+The Mac **Questions** entry point supports pending questions and saved answers;
+**Workflow** displays the three workers, Chrome owner/queue, and shared state.
+
+Browser preparation reads existing evidence files on demand. A resumed worker
+verifies its exact current tab in the preparation turn before any form action.
+The separate initial tab binding and final submission guards remain in place.
+
+## Layout
+
+- `job-review/`: Python API, workflow storage, worker runtime, contracts, and tests.
+- `job-review-ios/`: shared `ReviewCore`, SwiftUI iOS app, simulator project, and tests.
+- `job-review-mac/`: SwiftUI/AppKit dashboard, Questions editor, live workflow, and tests.
+- `SOURCE_MANIFEST.json`: SHA-256 hashes of the exported source files.
+- `VERIFICATION.md`: checks performed on this export and their limits.
+
+## Build and test
+
+Use Python 3.10 or later. The shared answer store requires the pinned BLAKE3 library:
 
 ```sh
-python3 -B -m unittest discover -s job-review -p 'test_*.py'
+python3 -m venv .venv
+.venv/bin/python -m pip install -r job-review/requirements-pool.txt
+.venv/bin/python -B -m unittest discover -s job-review -p 'test_*.py'
 node job-review/test_ui.js
 ```
 
-Tests use temporary fictional databases. Real Caddy tests require a verified
-Linux Caddy executable supplied through `JOB_REVIEW_CADDY`, OpenSSL, and an
-HTTP/2-capable curl for HTTP/2 coverage. Report skips separately from passes.
+Tests use fictional temporary databases. HTTP tests need loopback sockets. Optional
+Caddy tests require `JOB_REVIEW_CADDY`, OpenSSL, and an HTTP/2-capable curl where
+applicable. Report skipped checks separately from passes.
 
-## Deployment entry point
-
-Generate a private device-access configuration with `device_access.py` only after
-the Linux HTTPS origin is known. Inspect each command's `--help` before using it.
+On macOS 14 or later with Xcode:
 
 ```sh
-python3 job-review/tailscale_backend.py check \
-  --db /absolute/private/state/review.sqlite3 \
-  --access-config /absolute/private/config/access.json \
-  --credential-file /absolute/private/config/credential.txt \
-  --port 8766
+python3 job-review-mac/scripts/verify.py
+swift test --package-path job-review-ios --disable-sandbox
+python3 job-review-mac/scripts/build.py
+python3 job-review-ios/scripts/check_ios.py --build
 ```
 
-`run` and `status` accept the same arguments. `run` creates a verified backup
-before migration and holds a database lock. `status` only checks the local API;
-it does not prove remote TLS or phone access.
+The Mac package uses the sibling iOS package. An unsigned simulator build does
+not require a signing team. Select your own team locally before installing on a
+physical iPhone. Font licenses and asset provenance are included with the assets.
 
-Move production data separately through an authenticated private channel. Use a
-consistent SQLite backup, preserve all tables and request receipts, and perform
-a coordinated final cutover. Do not copy a live database file while ignoring its
-WAL. Do not run independent writable Mac and Linux copies as one logical server.
+## Deployment
 
-## Remote Chrome design
+See `job-review/README.md` for private API setup and runtime configuration. The
+runtime example contains placeholders; fill them in a private configuration file.
+A runtime config alone does not grant browser-worker capability. Native proof
+must match the target host, binaries, browser, configuration, and source. Exact
+reviewed runtime compatibility is documented in `job-review/PROOF_COMPATIBILITY.md`.
 
-The target design is a dedicated TigerVNC virtual display, a lightweight window
-manager, and headed Google Chrome with one private persistent profile. noVNC and
-websockify make that same session viewable from a Mac browser. A separate private
-Tailscale HTTPS listener protects the desktop route. This design still requires
-Linux implementation and verification; it is not part of the current Python
-runtime.
+The current native Chrome integration is verified in a supported Mac desktop
+environment. A source export does not establish Linux browser support. Keep Linux
+workers disabled until that environment has independent evidence. The historical
+`LINUX_SETUP_PROMPT.md` describes a separate deployment task, not an executed step.
 
-References:
-
-- [TigerVNC virtual X server](https://tigervnc.org/doc/Xvnc.html)
-- [noVNC deployment and localhost binding](https://github.com/novnc/noVNC)
-- [Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve)
-- [Tailscale Serve CLI](https://tailscale.com/docs/reference/tailscale-cli/serve)
+Move production data through a private authenticated channel. Use SQLite's backup
+API or a coordinated stop; preserve WAL data, request receipts, answer scopes, and
+submission history. Submitted, uncertain, or quarantined applications must never
+be reset merely to run a smoke test. Do not run two writable copies as one server.

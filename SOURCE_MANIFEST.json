@@ -1,10 +1,622 @@
 {
-  "export_date": "2026-10-16",
-  "scope": "Backend source, tests, contracts, static UI and fictional fixtures only. Production data and host configuration are excluded.",
+  "export_date": "2026-10-25",
+  "scope": "Backend, shared iOS package, native Mac app, reusable tools, tests, contracts, fictional fixtures and build assets. Private runtime state and host configuration are excluded.",
   "files": [
     {
+      "path": ".gitignore",
+      "sha256": "a28dc1f1c0d1771713e011d73093813de7d46ea13222fb934d241b93a6c407ba"
+    },
+    {
+      "path": "LINUX_SETUP_PROMPT.md",
+      "sha256": "d9c30f2321dfe5af743c40faa5aa7b714b6d3b0f7b2dbeb08e606359cba6ee7c"
+    },
+    {
+      "path": "README.md",
+      "sha256": "95a2dc72ddef6a011170388f66c038ac7776129aea705d3fe62d37b5f1b935d1"
+    },
+    {
+      "path": "VERIFICATION.md",
+      "sha256": "ead717267164556a44062931aca632016d974ab299c229c3a028f6c6ba39b6ca"
+    },
+    {
+      "path": "job-review-ios/.gitignore",
+      "sha256": "53e31ea4eb94b0cc36c516870e0bfea43fb36e2da1aaf574cb48e8d714ac7468"
+    },
+    {
+      "path": "job-review-ios/App/AppModel.swift",
+      "sha256": "9c2a4796297e888c685abf6ebe81cff953ad6c1729fe9ff3eb2bf4f0bf760692"
+    },
+    {
+      "path": "job-review-ios/App/Assets.xcassets/AppIcon.appiconset/AppIcon.png",
+      "sha256": "7495669bceb21fa79d464e52e6b7950ce0ea0f79cb4a0fa2e60e4d699a94ee04"
+    },
+    {
+      "path": "job-review-ios/App/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      "sha256": "6ad2c5c3bbcf972c7f02d217d6afcac3f24a10e30510c7e2d06c582371ed9d22"
+    },
+    {
+      "path": "job-review-ios/App/Assets.xcassets/Contents.json",
+      "sha256": "10e3b5dc202f1cd9fad1f688c8fc9fe9e9669bf3f8295e67d216b10fd99b6f49"
+    },
+    {
+      "path": "job-review-ios/App/Fonts/Inter-Bold.ttf",
+      "sha256": "288316099b1e0a47a4716d159098005eef7c0066921f34e3200393dbdb01947f"
+    },
+    {
+      "path": "job-review-ios/App/Fonts/Inter-Medium.ttf",
+      "sha256": "97ad806f526e41546d46365bb3a393145f75b7b1568913db74549ad8b8dba872"
+    },
+    {
+      "path": "job-review-ios/App/Fonts/Inter-Regular.ttf",
+      "sha256": "40d692fce188e4471e2b3cba937be967878f631ad3ebbbdcd587687c7ebe0c82"
+    },
+    {
+      "path": "job-review-ios/App/Fonts/Inter-SemiBold.ttf",
+      "sha256": "78a843fade9d4612a5567302fb595b56976eb5fcebf4fea5a5912d638bafcde3"
+    },
+    {
+      "path": "job-review-ios/App/Fonts/LICENSE.txt",
+      "sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a"
+    },
+    {
+      "path": "job-review-ios/App/Fonts/SOURCE.md",
+      "sha256": "30200863a166326e4768446c72baa5bcdb96f3564e19bd37a1a41593ba2d5584"
+    },
+    {
+      "path": "job-review-ios/App/Info.plist",
+      "sha256": "9043095d79c46a4c10f0668a393ff6c090fcf24f4826345c448c31cee23bcfa4"
+    },
+    {
+      "path": "job-review-ios/App/JobReviewApp.swift",
+      "sha256": "18a40ae8ccd2d316bf453557fb8f5e94dde16d336766beda530ed053b37a30f3"
+    },
+    {
+      "path": "job-review-ios/App/QuestionDraftSync.swift",
+      "sha256": "03e1c5c801e84d6ba625ce955798a47e90b528534347411dd9ad484ca3a9b4f9"
+    },
+    {
+      "path": "job-review-ios/App/ReviewViews.swift",
+      "sha256": "e1bbb3911b2f2607f9706226752575535a5ff1a2b6a847dac0e58153d6519bd0"
+    },
+    {
+      "path": "job-review-ios/App/SavedViews.swift",
+      "sha256": "df5b98e9a9bfabc3b43c72893f21de4f076bef9347fde56292afbcfe1a2af89b"
+    },
+    {
+      "path": "job-review-ios/App/SecureTokenStore.swift",
+      "sha256": "c766cb8866b95adffe48114edc9ce72e5f7246124ba59b8b9068a673b6573fea"
+    },
+    {
+      "path": "job-review-ios/App/SettingsView.swift",
+      "sha256": "c2e5969f5f4412c258fb5d30eceb4e4cbea650c0949ea0f172a0c538267a5b62"
+    },
+    {
+      "path": "job-review-ios/App/WorkflowViews.swift",
+      "sha256": "cf8f301bc556d4281c50c0a240e9813cc83ad3357348dec11d73148aded39862"
+    },
+    {
+      "path": "job-review-ios/JobReview.xcodeproj/project.pbxproj",
+      "sha256": "4a42794aee2ccd8e931f37a8bc3225214df06116f7d2736d7b1be90683c7aea7"
+    },
+    {
+      "path": "job-review-ios/JobReview.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+      "sha256": "7f3b00b5c3fdb45242d7b87e1e5c4e25d1fa8129a16c94295ecc4e8ea2235c5f"
+    },
+    {
+      "path": "job-review-ios/JobReview.xcodeproj/xcshareddata/xcschemes/JobReview.xcscheme",
+      "sha256": "dc941d065dab7bd5b4feebcd83d7160415e49e724972af6ef0dd8505b72d1f4d"
+    },
+    {
+      "path": "job-review-ios/Package.swift",
+      "sha256": "c751a9895aa549b9521e77fc897fd115d9dd9fe6170cdcc294741cacff190d82"
+    },
+    {
+      "path": "job-review-ios/README.md",
+      "sha256": "6dfcbcca05a861c267cfc0d2baeecca53e3bd8e66c48266f003b9903efbbba6d"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/CompanyPresentation.swift",
+      "sha256": "f971d4e669eecec0dc4192ee0302876704d2c5b497dd7e16ae8cd7886c954a3b"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/DemoService.swift",
+      "sha256": "73cbc535b3c27fde7b7632fde80ed9d00aaafb44702b1741dc73628fb3b4cbb0"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/JobPresentation.swift",
+      "sha256": "b4f707dec336f65151bf2eab79efb49a967fc2b6138e067188f2f5e19f5aaabb"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/JobSelection.swift",
+      "sha256": "48ac45402ae66a4d2eaa6765f5a8e1db85608db0ba2bee8eb6f5228ae9582e65"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/Models.swift",
+      "sha256": "43c65c46e28418377e9e67b834478a5265cd68d07874cb59b037590b94ad5a23"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/Persistence.swift",
+      "sha256": "830c7ea3e831ca16018996a4ce087139bc68d262e68dc12f07bb09f7d44adec5"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/Resources/demo-state.json",
+      "sha256": "d3f43966c61a5bbc01a827552bd9aeb40383e7640e18da7fc36e8aa10cad35d5"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/ReviewAPI.swift",
+      "sha256": "922b19477a22870c396ecdcedd62e02e87e8fa3f316e49f7433610b023f97d7d"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/ReviewSession.swift",
+      "sha256": "090b6fd1438504b90ba3e42661a7bd21b87bd305b39e3767281f5def44f92b85"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/SwipeDecision.swift",
+      "sha256": "498ef99fc8c79c1ddb9efcf4aa33e452302fea0a826bf86f738d4760e3130fa1"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/WorkflowAPI.swift",
+      "sha256": "0c8429dc1616331ed5f8dc9121b6493c5d2d43cd426da09a40f5bfef181c9267"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/WorkflowInstructions.swift",
+      "sha256": "336864849a3d4ded8dccea658c41dfe9b8c04ce96a44a2cf8e4c1acb64d99a89"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/WorkflowModels.swift",
+      "sha256": "7d1178d622edf97b0b6069ca229f94e9875005a0ba4a09d475eb18c007a44984"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/WorkflowQuestionSync.swift",
+      "sha256": "3cd7b3857654a5814f92200497f401fedd0c938d9c270bd4016fee098c93b3f5"
+    },
+    {
+      "path": "job-review-ios/Sources/ReviewCore/WorkflowSession.swift",
+      "sha256": "4088c65bf17d9cee5dc6fb668afab7f5d44b00468acf51d137a056f703fc215f"
+    },
+    {
+      "path": "job-review-ios/Tests/ReviewCoreChecks/CoreChecks.swift",
+      "sha256": "02beaf4b812444e4b2f0ec2f6047207371e99ef5828aa5a2cbdffc690990f5af"
+    },
+    {
+      "path": "job-review-ios/Tests/ReviewCoreChecks/WorkflowChecks.swift",
+      "sha256": "4505bc46e04db2cbb945171db6ef15038ea012c0fd04d4a47b521b4a94b70306"
+    },
+    {
+      "path": "job-review-ios/Tests/ReviewHTTPSChecks/HTTPSChecks.swift",
+      "sha256": "5a9d4b643a43e1563d9f9ac2351803a1dbcbd4d45ef55a5764639c9e555f5b94"
+    },
+    {
+      "path": "job-review-ios/Tests/WorkflowConfirmationTests/CompanyPresentationTests.swift",
+      "sha256": "d01af5d09abb2b760f4fbca5030cf413f0c85cb6a204c93c904cea32fb13ef8f"
+    },
+    {
+      "path": "job-review-ios/Tests/WorkflowConfirmationTests/JobPresentationTests.swift",
+      "sha256": "257889b289c029a2b8fe3e33ab3b582bac0c5e37477f6ad2e7b47c209df340a6"
+    },
+    {
+      "path": "job-review-ios/Tests/WorkflowConfirmationTests/QuestionDraftSyncTests.swift",
+      "sha256": "e995839b06aba95aacfaf77f9132944f23e3482122bd998ce2917d143827f647"
+    },
+    {
+      "path": "job-review-ios/Tests/WorkflowConfirmationTests/WorkflowConfirmationTests.swift",
+      "sha256": "d893ce53e02830bd30bce51373717bc758378d071b8281aa8e4770fd838a2509"
+    },
+    {
+      "path": "job-review-ios/Tests/WorkflowConfirmationTests/WorkflowHealthTests.swift",
+      "sha256": "5f345f6efc742b01098addd6a03f5ad1f43a15cab990d37902493e5e773bfb3c"
+    },
+    {
+      "path": "job-review-ios/Tests/WorkflowConfirmationTests/WorkflowInstructionTests.swift",
+      "sha256": "45b203f0b25dd062b24f9aacf470bf2bf04fb8d512ea5465ec400637349935b4"
+    },
+    {
+      "path": "job-review-ios/VERIFICATION.md",
+      "sha256": "291e4a906cd8028cacea6a5d1bab28a091d313aa4eb2277aa23f3bf81980ff1d"
+    },
+    {
+      "path": "job-review-ios/scripts/check_ios.py",
+      "sha256": "95aedf3cfecb7c588496aac929546948628cd737bb8a7e6186868024e5724209"
+    },
+    {
+      "path": "job-review-ios/scripts/install_iphone.py",
+      "sha256": "3f0462e06fe7a9843d6bc68604745c06b190db5763b79a434ffb5ff95b112260"
+    },
+    {
+      "path": "job-review-ios/scripts/package_preview.py",
+      "sha256": "1795f2bdb9b5083d3d7b4c6b39e666f2145539465e70ca152635883492a3a4a6"
+    },
+    {
+      "path": "job-review-ios/scripts/simulator_fixture.py",
+      "sha256": "17f16be43a99b4923619187765433c8a0e48dd96b9ff74aa3672ddba66135401"
+    },
+    {
+      "path": "job-review-ios/scripts/test_check_ios.py",
+      "sha256": "2b805cbf6335582c5f3e16158bdaa9153207a437707f43ec06606c90167999af"
+    },
+    {
+      "path": "job-review-ios/scripts/test_install_iphone.py",
+      "sha256": "333e7ce1519a9d03837b0c105fd6dfe1f3921c03e2e276c3f9ac077c6c085cf2"
+    },
+    {
+      "path": "job-review-ios/scripts/verify.py",
+      "sha256": "a8efb85dbe6eb15b2b39944463c58f31c9f0d4834caad57856de682fa42a3f43"
+    },
+    {
+      "path": "job-review-ios/scripts/verify_https.py",
+      "sha256": "3aeb75db3b4f5ff8caec3e06663cb4019962a647e62543c12f699514947d5ed6"
+    },
+    {
+      "path": "job-review-mac/.gitignore",
+      "sha256": "98804de6e29b7725bc34939e01238c284295712d325fef53c41e0b7bb4ab1bb8"
+    },
+    {
+      "path": "job-review-mac/Package.swift",
+      "sha256": "1a1b3ad112e7ff5ee55e313c5b543267a99f2329a32cc099b25ed8f7b34720ff"
+    },
+    {
+      "path": "job-review-mac/README.md",
+      "sha256": "235c6a51afc152b1a16107bb77b6898dc362561856c623ad117dd574b671514d"
+    },
+    {
+      "path": "job-review-mac/Sources/DashboardProbe/Probe.swift",
+      "sha256": "c49171496915a9a6c14c28d7bea7c45f79ce5ad44aa4c20655c87d2c3eee01d8"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/AdminOverviewView.swift",
+      "sha256": "59cf3965f1245f864c8e4b7c3ffa5fc34e54be3d62d47b70fa9b0225ebf0229d"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/AdminShell.swift",
+      "sha256": "4604d07bf03444e34680b668c7c54ab3211deae9dddd8be38cd15710e361226f"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/AdminTheme.swift",
+      "sha256": "02abd2f1f9d60af11dd00b5d118f00a11c2636536360b9e47e4bd031ec90f138"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/AgentInstructionsModel.swift",
+      "sha256": "072ee9ca451795499456e622996621a29d29059e0cf73e09985f83cd6bfb8bff"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/AgentInstructionsView.swift",
+      "sha256": "97383d8d33fcb7d728935faeb277971f4bad46731bc822e129d625bf775cec8b"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/AppMain.swift",
+      "sha256": "a4bf6c829c3312f5effc040494447bdf3cba4a711812d0e611ce740af7326ada"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/ApplicationQuestionEditor.swift",
+      "sha256": "d60cf900de0271f37e506e9de7eea94fde8de8b669354cbbe9927f5da3c1b610"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/ApplicationQuestionsView.swift",
+      "sha256": "2d7fe3434fccfa22932aa7b95f69473a14fb7a62bd08ec6d4cc8e788d9af10c0"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/ApplicationWorkflowDemo.swift",
+      "sha256": "87e0f43e2b6e6db5c447ca4e8cb243118621d70e003fa756df997251692c0e76"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/ApplicationWorkflowModel.swift",
+      "sha256": "ff927d80e7e0606164535d0e9c94042e7ad263646a8a765f3c13f6bb5c5eb945"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/ApplicationWorkflowView.swift",
+      "sha256": "9af29e0c70efae738dade664fbd38b707f314fc463c36194dfc425cad89ad43b"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/BrowserAccessView.swift",
+      "sha256": "4cf5e26395401afcb2c86db9122aadf1e022b781b775b7bb127c8ff05c732bd5"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/ConsentIntentStore.swift",
+      "sha256": "3e2aa7566bb0fd8237b41eb3afd170f1aaa081cdebdd3c131f7067d4ed877152"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/DashboardInstructions.swift",
+      "sha256": "fecc3ba5562a8c028c7ad55cb0c4ff254dc7cafcb70786a0b510985e7285dbe3"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/DashboardModel.swift",
+      "sha256": "d44ba620627fb1dd2467d7f5ed5e3674406b2a9554f047fec3ff3cbc036d291c"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/DashboardView.swift",
+      "sha256": "599e1a95db6ce3286d367ba1a94b9b9ef30cd251eb2435286fa29c4d61a56a55"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/DashboardWorkflow.swift",
+      "sha256": "a205c9592ed8221768292da6c640fe17b4b7628d9935d6ea2537d7badc4e1701"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/DemoInstructions.swift",
+      "sha256": "5061d35d34d4505d54d966e99136810b254ecf49b70d0f47945477fef726ebcb"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/DemoSnapshot.swift",
+      "sha256": "e0ae3727de84bdb09694ff638855d16515f7c039960a965989d5d4a70b70b996"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/JobBrowserView.swift",
+      "sha256": "afba3f0d959cbcd7e9dd94b445f1fb69c52428209a045ec438cbb2379f908b6a"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/LocalServerControls.swift",
+      "sha256": "80f487fe4be573bb9fe5bab3a5dd84cef3d741cafe52e115105b631b2391d538"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/LocalServerModel.swift",
+      "sha256": "6a7af4728a33005fcc4170753537a61ccd7766713b3da682e789020d56719e52"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/ProjectConsentModel.swift",
+      "sha256": "6c6265d2d978ba4d8c12512140a6517dc51f38dfed364677cb0e0be93fcb0fe9"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/ProjectConsentView.swift",
+      "sha256": "e8317c82cd04343f1546da63803f4d14c7ab398b152107b3fcb512c06a55f1a1"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/QuestionSyncDemo.swift",
+      "sha256": "6cf8ec2df40ec7e64ac976f4cd6d43da189d58f4721afccb3cf137f24d75a706"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/QuestionsInboxModel.swift",
+      "sha256": "965957ff7bf1eb9233728b65f746c3bad32453670b296ef5aa78a2077db87a0d"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/QuestionsInboxView.swift",
+      "sha256": "b0ab05e5d39b4e69fbf76921298974b6ac0ccd58258de78405be93bd80627150"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/TaskBoardColumn.swift",
+      "sha256": "7d1c54397ebb04ee171f3dde43e2abcd5fe74ee61cdd97c8faaccbc18db1475b"
+    },
+    {
+      "path": "job-review-mac/Sources/JobReviewMac/TaskBoardView.swift",
+      "sha256": "cf452c187b1d3e91232dd53f8b382f4841a61cc89779bd10a05ffdef44122415"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/ApplicationBrowserAccess.swift",
+      "sha256": "0125204164f73a38a57c0905e620561f86c511e76b698bbb6173f0996c4b7a38"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/ApplicationWorkflowClient.swift",
+      "sha256": "f3a55a6d4db49443fc30cdc2841027e9ae11d113cbbf46e2e3d56ecd10b4d53b"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/ConnectionSettings.swift",
+      "sha256": "15d419d80c2e8a80ceaa7a7b6897cecd6429be4f67b5767158b8db8960874f1c"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/DashboardClient.swift",
+      "sha256": "67b2efe516db970de8bb55e1f6ed276d08e53939ea56d1e043f1988be92de9b0"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/DashboardError.swift",
+      "sha256": "ae374aec488130eac5c0b17c34913eaafbebc5a41ae0f504fb8cc679246b38e6"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/LocalCommandRunner.swift",
+      "sha256": "f06632b41952e58a3c4077094d3fe1bec9c30e3483c45dd80b5e381d93ee7e6e"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/LocalServerController.swift",
+      "sha256": "c36cc6bb7c961a73f055f60cd807d2d6fc3f679d75ad5cde770068099c3dda61"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/MacWorkflowClient.swift",
+      "sha256": "51598810e17441f2bf1cd3361564ddf1a986ac98f69015ece72d9f440bbf3337"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/PrivateWorkflowPersistence.swift",
+      "sha256": "154688b900fe8e8684853f7a7314a73df52d84b3c40dc3f34c4985b90f22d0bc"
+    },
+    {
+      "path": "job-review-mac/Sources/MacDashboardCore/ProjectConsentClient.swift",
+      "sha256": "4e9daed86e6ec37b79dbbbb65ef68fc7c6509145968fe58fca9cb6f69a51b796"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/AgentInstructionsTests.swift",
+      "sha256": "4386ca6d1caba42030e05ab6f3b1288224665b5ce20925472d161c67ee6d2526"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/ApplicationAnswerCopyTests.swift",
+      "sha256": "3b2f2172e99ba9007309412b0ec793ef45fc9c7b00d57b318ba40d57471d4d99"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/ApplicationQuestionsTests.swift",
+      "sha256": "646a6f6f695303e7a2d9c03d03a429a7f4129b9fab89ff4cc6e6a57b8f1d0307"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/ApplicationWorkflowTests.swift",
+      "sha256": "b2756762f4d6244619a65cfcd5578470a88a92fda06ee74d2a9bb91c96280167"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/CanonicalQuestionsTests.swift",
+      "sha256": "0f2cd4db753ebb61bd05427d56dcb04fdf596933e32cab67c087ae317d7fddf0"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/CrossDeviceAnswerTests.swift",
+      "sha256": "08b3af0ca3d0ba5f6271ffdc0b7e8610bf100c15fb047576130620555d6603bd"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/DashboardModelTests.swift",
+      "sha256": "dae88cf8e8c3b9249e1e0cd0eefbd152c1a0216d7fbc6840ad43035b31e3965d"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/DashboardWorkflowTests.swift",
+      "sha256": "26e3d92bce0e0033e02fb5b3fd363654a954805ef23df1e57196a45d5eb264fb"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/LocalServerModelTests.swift",
+      "sha256": "f819b0bf3f0226837cdfd8410fac5e0414297b2c16a133d4ae46761385e1de60"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/ProjectConsentModelTests.swift",
+      "sha256": "403cf9938375a65b80569d4997cb03434cbc3fe6a52a3d51f9a8bc290983e700"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/QuestionsInboxTests.swift",
+      "sha256": "f64d222aca5af72219d1ba50ea5f85007dde9daa2d804ae1d5361e097d9e533f"
+    },
+    {
+      "path": "job-review-mac/Tests/JobReviewMacTests/TaskBoardTests.swift",
+      "sha256": "68daaa81f7b64032e615e9fd85d74b9559af571afe5443ee9dbbcb3f8e77dd6b"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/ApplicationWorkflowClientTests.swift",
+      "sha256": "5f6a6e063553da44c479cf06e87a0fb5cb7d0a1cce669f1b681d838aaed961bc"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/ConnectionSettingsTests.swift",
+      "sha256": "8cc584f748928fb0f2693b6d4bdd1acc83f3aba8d5b2c8b7416fbb9460d75fdd"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/DashboardClientTests.swift",
+      "sha256": "af2af6208aa34ab9420acaec9be9f1b6d01418f6fadf442827046bb69e489919"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/Fixtures/question-sync-updating.json",
+      "sha256": "309419b21cd0351f357f54a7b44fbd852592bb5ad5cc4501a6d6ea91efe8340f"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/Fixtures/question-sync.json",
+      "sha256": "8bf8dff0cc57e14aeb03636bbec4fad884a0ac13d0924c50a0f167bbfad0f7ec"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/LocalServerControllerTests.swift",
+      "sha256": "1b0a0cecbf8c5420dd340f72f07a336b99ca3de007199b6459a3b1528855c4c5"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/MacWorkflowClientTests.swift",
+      "sha256": "1052d8701e78eab96115022dbad2aef164a97e194461c7013e520e71e9c044c2"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/PrivateWorkflowPersistenceTests.swift",
+      "sha256": "3838ed58a3dfae92f0623386528f96d8fc904e61fb1a6b7d3633eb0b1e58f679"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/ProjectConsentClientTests.swift",
+      "sha256": "da3c4eb420bff711a2df3d4dbabab598d3721868542d68d7fae5f58b24c1faa8"
+    },
+    {
+      "path": "job-review-mac/Tests/MacDashboardCoreTests/QuestionSyncCoreTests.swift",
+      "sha256": "051b812d699ddc1ebf6ea3b6ac7bddd8cf1d1d8225b3c40fc5b074da216bc9da"
+    },
+    {
+      "path": "job-review-mac/VERIFICATION.md",
+      "sha256": "306add40c55d941bb679936d229c5ddaa1883379fffe066477e0486edbb1ce7f"
+    },
+    {
+      "path": "job-review-mac/scripts/build.py",
+      "sha256": "b8b51565922b44d0b6d7af25873ffedad8700935a26f1900a6cdfce222eaca09"
+    },
+    {
+      "path": "job-review-mac/scripts/install.py",
+      "sha256": "f0aaee5d7b5e6ce025bc6ce3b93870b53c6cf02c4818d834ac9647a9f3ed61e0"
+    },
+    {
+      "path": "job-review-mac/scripts/make_icon.swift",
+      "sha256": "a934a5bba7ae69031b8df49700ca67298eb6ee1aa7f03e5e199441418a4fa1b1"
+    },
+    {
+      "path": "job-review-mac/scripts/smoke.py",
+      "sha256": "127913750e97f94cf78bf3f4e323439464644d4bf9ce8b67ec5dd2329268bd4b"
+    },
+    {
+      "path": "job-review-mac/scripts/verify.py",
+      "sha256": "d53bf96c7526e5c29379b5bb8c2cd30696dbcb85871a12644d05e0ac1660334e"
+    },
+    {
+      "path": "job-review-mac/scripts/verify_server_lifecycle.py",
+      "sha256": "de2731f47654f22c644e4769b8ac19ca965546dd840b7fcf749a8f5ad3c9c81b"
+    },
+    {
+      "path": "job-review/APPLY_POOL_CONTRACT.md",
+      "sha256": "b7c2b4ffce3b9f1a89fed7dd766c1bdd9835e1f2fca47aaff41a59f50e0bf4a6"
+    },
+    {
+      "path": "job-review/CONTRACT.md",
+      "sha256": "2aa89008103ace60c7c2087a4a90a2ead664a7762d9564b516ab67ca1f6be1bb"
+    },
+    {
+      "path": "job-review/CONTRACT_V1.md",
+      "sha256": "887850660887523af55674d80d82d9a924d2532b101dd8c07ded1a7dfac150fd"
+    },
+    {
+      "path": "job-review/PROOF_COMPATIBILITY.md",
+      "sha256": "4c21af95635e5812f9f257b903ebcf63c6784dd6d2b0aaf38d458cdaf1544f34"
+    },
+    {
+      "path": "job-review/QUESTION_SYNC_CONTRACT.md",
+      "sha256": "2259e5ca3b8dd4b315239133b2e094e0c0f41076700cc00a9473dab113ac6fc1"
+    },
+    {
+      "path": "job-review/README.md",
+      "sha256": "36238d3af4f9f7fd393a8d01321050c3a7ff57900ba344992986911e3cea3d24"
+    },
+    {
+      "path": "job-review/UNBLOCK_INSTRUCTIONS_CONTRACT.md",
+      "sha256": "6f3645275217f8e962241457f860224850ebe22fc3b5b6378b1e13bfacb3fe3d"
+    },
+    {
+      "path": "job-review/answer_profile.py",
+      "sha256": "2b853cd18e5b34cbb2382e3c52c627b9d0de03dbac8cf8cf07ad2d4d6bd6bf4c"
+    },
+    {
+      "path": "job-review/answer_reuse.py",
+      "sha256": "201ac3524e7a923d80c400cbf7cdc33fcf0ca72089fb6a0dcf3ac0574e08e692"
+    },
+    {
+      "path": "job-review/applicant_evidence.py",
+      "sha256": "4097d7d030ba5b2fc6eb60a9dcbb2ed62251ae40666c78ae21c954effce5ca7d"
+    },
+    {
+      "path": "job-review/application_blockers.py",
+      "sha256": "280dbcb66488f83c1ad3ca0dba9da57f6d16b0e730364832d3d8f078db9b8945"
+    },
+    {
       "path": "job-review/application_flow.py",
-      "sha256": "2cb61847824c3af98335460ea58bb3959f0501c043514f7bc196de844dd400ef"
+      "sha256": "79b8ee81623dab5b74c4964759840dafce453036d94dc17574e1cd968ddfff18"
+    },
+    {
+      "path": "job-review/application_pool.py",
+      "sha256": "b9a5f264f1d7d2275bba27bb8252ae7ab88d11e1c8ea3048e43068e2ba09047e"
+    },
+    {
+      "path": "job-review/application_pool_cutover.py",
+      "sha256": "1bcc96582557d56150942a98d0425bcee0b0bf7a4f2e6479bee5b4ed97e2b081"
+    },
+    {
+      "path": "job-review/application_pool_proof.py",
+      "sha256": "b5388a770595ea88f307eb93b39305e029065b3b5c673c089a968e595f9443ea"
+    },
+    {
+      "path": "job-review/application_resume.py",
+      "sha256": "580c3be6b8d9cec21f04bb3d51279d4963cf82fe63a53a601d2e37ae773602c8"
+    },
+    {
+      "path": "job-review/chrome_access_gate.py",
+      "sha256": "51952827495cda9b50c4c0227f3f51478ac31269615a4930f461938181eeae11"
+    },
+    {
+      "path": "job-review/codex_appserver.py",
+      "sha256": "f68567b4cc7beeeb1785aabd4a47b48e28170f3182df2ecbf8ff17a00c067e1d"
+    },
+    {
+      "path": "job-review/codex_runtime.py",
+      "sha256": "c41a5d271a7d39a4fdb1ca16eb99abd27bdf2648bf79e39904b3f1ddf840f536"
+    },
+    {
+      "path": "job-review/codex_transport.py",
+      "sha256": "66f02fbb92c751cb13476c5c046bc1d95e65d4937f5aaa90b0b96920fbe8cdb5"
+    },
+    {
+      "path": "job-review/device-stack.example.json",
+      "sha256": "7a6bacaad8618f936146afb3420553407ba325f7c90b27a75ef0f53307cb9fa5"
     },
     {
       "path": "job-review/device_access.py",
@@ -15,12 +627,84 @@
       "sha256": "dd1fdc054dbeeb9d6dd99b3baa241f4771b5792e094cc56d7ad557e5644b2a1c"
     },
     {
+      "path": "job-review/fixtures/application-workflow-chrome-queue.json",
+      "sha256": "55e1705e4bb0fd301f0ef04d24d0f396eb59c48df3769651ba723302485f6803"
+    },
+    {
+      "path": "job-review/fixtures/application-workflow.json",
+      "sha256": "be4bcaea5ce7817c23ab7735ba56084c41ed64a33ebf2765eeeccf3cc70c1927"
+    },
+    {
+      "path": "job-review/fixtures/auth.json",
+      "sha256": "fbe56e2fbd3c8de310277da8e33755f2eab27de75958799b0106d8b283d3cb94"
+    },
+    {
+      "path": "job-review/fixtures/health.json",
+      "sha256": "b3be49d74334c19a795b2d9c829044a68e3a04d147ce6e22bb48846b38e98af9"
+    },
+    {
+      "path": "job-review/fixtures/question-sync-updating.json",
+      "sha256": "309419b21cd0351f357f54a7b44fbd852592bb5ad5cc4501a6d6ea91efe8340f"
+    },
+    {
+      "path": "job-review/fixtures/question-sync.json",
+      "sha256": "8bf8dff0cc57e14aeb03636bbec4fad884a0ac13d0924c50a0f167bbfad0f7ec"
+    },
+    {
+      "path": "job-review/fixtures/ranked-flashcard.json",
+      "sha256": "cc2bdf1fa2de088022859aaa4899468d4244c2445b63e357d312f4f6ec9586c1"
+    },
+    {
+      "path": "job-review/fixtures/v1-http.json",
+      "sha256": "df97bdb5300162365563d40d260e545fba61be90e6d543d5db46627f72012667"
+    },
+    {
       "path": "job-review/import_catalog.py",
       "sha256": "d3a3f812d9c5fe890d2bfefe72a0dc9d3ec5acaf79a7fc571de5e41f2cc7fccb"
     },
     {
+      "path": "job-review/index.html",
+      "sha256": "37d8871ce98ec137fcdaedec67d631545f5169b2775b1a5d09dc0353be0ed290"
+    },
+    {
       "path": "job-review/orchestrator.py",
-      "sha256": "cdf85702e14a78b69b84d9bbe184c0718311d5b44add40390bab380aa56601d7"
+      "sha256": "c1288709c0321d40144a468a136a7af0d5f95e4bc1ce009aa15b809445670d24"
+    },
+    {
+      "path": "job-review/pool_application.py",
+      "sha256": "e2c21b37d4a9230747b1d17e59b78e5666d858c9a2b74ccf9a61db6a117e4055"
+    },
+    {
+      "path": "job-review/pooled_browser_session.py",
+      "sha256": "839f24bdd73858b9539674877eea85e7448c782de5e2122c692c12464dd2c2f1"
+    },
+    {
+      "path": "job-review/posting_recovery.py",
+      "sha256": "ee62f783e1ba11a18210bc34a0513873778c372b8b49ecd6532f2d01d7e48440"
+    },
+    {
+      "path": "job-review/prepare_catalog.py",
+      "sha256": "ad7a2e1cc9e45584cc6bdc842ec7d26482acb4b6d4d79a5bf2038b25b98a455a"
+    },
+    {
+      "path": "job-review/project_consent.py",
+      "sha256": "a32cbd61c0d06e59ee4b5f661eb13455d8a5d50f102664ca88b04116ebc27a1b"
+    },
+    {
+      "path": "job-review/question_pool.py",
+      "sha256": "a5aa110521db628951a75b4eb3a6d5651c7c0a6dc0791111fa04445da30dcbd0"
+    },
+    {
+      "path": "job-review/question_recovery.py",
+      "sha256": "e406eb999d5af18aa4a9a4c2fbd42ff2e3b7b7a1a39c9b4c0ae1e472703b3d61"
+    },
+    {
+      "path": "job-review/question_sync.py",
+      "sha256": "e7e2fe8e229b91cb10ed62974b2df21d193103f62a47f8d96299655334493512"
+    },
+    {
+      "path": "job-review/ranked_output.py",
+      "sha256": "3aaccef4912182204bc119266ac542a15668d9c5b1ca315db62dad05bc161ad3"
     },
     {
       "path": "job-review/ranking.py",
@@ -28,11 +712,31 @@
     },
     {
       "path": "job-review/readiness.py",
-      "sha256": "2b233a65e812a422e51e2060ce4d99d76a3f1f0cea6a92a43340ba7cd28cc1ed"
+      "sha256": "01e6da2e1a5e3c49f43a3fa4a169419fbfbcd646f9f6cfdcc9766201e11a55d9"
+    },
+    {
+      "path": "job-review/readiness_recovery.py",
+      "sha256": "44fedac73f5b805918f7e17263622c538a263501ab0862e2d852467a01206f87"
+    },
+    {
+      "path": "job-review/reconcile_questions.py",
+      "sha256": "6611dadec8c546e3322c732ed42fc546eed30a069511444255d60a18a6c6798a"
+    },
+    {
+      "path": "job-review/requirements-pool.txt",
+      "sha256": "b48af1484e4c0ce6e6b3740e3e93e48d487172102613719f4164f84b072f5ea1"
+    },
+    {
+      "path": "job-review/runtime.example.json",
+      "sha256": "99a60ab0972266ae9b56192f43aa2c8732e629b2d12cf18b39ee1b387c37d67a"
     },
     {
       "path": "job-review/server.py",
-      "sha256": "2edf4176007fda0db538540081f11dde5a8bff373234c4411bb2bc6b97639a9d"
+      "sha256": "2d2cdcc8073c14d2e61d6262a0b2a2bdefbc24d426e29c4ecadcdd709eb520ed"
+    },
+    {
+      "path": "job-review/shared_browser_session.py",
+      "sha256": "42bc9080bace6cd0d61cbc9667507cc8e2c000325aae8bf5552e1b3429a55432"
     },
     {
       "path": "job-review/start.py",
@@ -43,20 +747,92 @@
       "sha256": "eb544b491012c1a2866a70f3338a6b88a12f79f10ad34199b7f992625916b533"
     },
     {
+      "path": "job-review/submission_recovery.py",
+      "sha256": "363d010efefff99e2dbf5927292d7d81012c97890ea4f9082762ea42c85241a5"
+    },
+    {
       "path": "job-review/tailscale_backend.py",
-      "sha256": "f46ea4c4893102f2617c9019d528653802889a6268680efc277f4552157dc16f"
+      "sha256": "9dc3ef87dc217b1aeb398ee294aa20c55e47b27d71972e091367306499de9ad4"
     },
     {
       "path": "job-review/task_store.py",
-      "sha256": "66eedf4f4acfbc9dc84bac17dc42d33e102f93e108aae41bdc461bc9453379d3"
+      "sha256": "2ea92db2773b84a7282a380a7edcd182f71bfb36defbbd8f2245bb8ec13c452a"
+    },
+    {
+      "path": "job-review/test_answer_profile.py",
+      "sha256": "6647da34dca281ee0fe4533f71364e9216ff82263965f8ffd93812c3e7c91963"
+    },
+    {
+      "path": "job-review/test_answer_reuse.py",
+      "sha256": "0c4d93514555ddfacc7c77bacc5d6c95f437f9b096e19a5a5cfe6bf6744b111b"
+    },
+    {
+      "path": "job-review/test_applicant_evidence.py",
+      "sha256": "39533d01682065251c93241400660809f2d10a729a94eb8008a6a46ab4cd5f48"
+    },
+    {
+      "path": "job-review/test_application_pool.py",
+      "sha256": "a1bc7d69b4397817a77749ccd437c57408d8f33d445229761d3da34c2b51d22c"
+    },
+    {
+      "path": "job-review/test_application_pool_compatibility.py",
+      "sha256": "52e436331a9d3fd21221bf2084330e7b76b2bdb3ad2d63d2c30c1c0f3a78bdc5"
+    },
+    {
+      "path": "job-review/test_application_pool_cutover.py",
+      "sha256": "ffe3e1b0fa35d9f54498ee01df894c1ee1fd617c7a6f62eaa570e29a554568c6"
+    },
+    {
+      "path": "job-review/test_application_pool_probe.py",
+      "sha256": "d04df2b4537341e72487f1d63a6091a3e9e4e7e0623c87d30b30e2e38a2a6075"
+    },
+    {
+      "path": "job-review/test_application_pool_proof.py",
+      "sha256": "052f3c0440a4562557b1d5f2d69135612c1bc2705fc33613a66a8489a6e6d76b"
+    },
+    {
+      "path": "job-review/test_application_resume.py",
+      "sha256": "832920bec09814b2f2f2b77e5f3bfa34cd31119bc6bf6cf4d84ee3ebd793bd61"
+    },
+    {
+      "path": "job-review/test_application_tab_affinity.py",
+      "sha256": "f09ac0874dcfbe2de10fe45b245c00b05ca6463b1391e7da5b53d4d711d81c4d"
     },
     {
       "path": "job-review/test_applications.py",
-      "sha256": "ea57ba1cbc87c67f16daccc8bd96748f5e6d4f0236b48f2f1ec427e1b03d417e"
+      "sha256": "f040cd3b33d587b372c419f5b18d40bc78ad95dd6db14f04a0d0b05fe3471eb6"
     },
     {
       "path": "job-review/test_authenticated_server.py",
-      "sha256": "6e4e1381b662fac9b6f819da9fe4444771a259992cd8d2b08663c30a9f55cff1"
+      "sha256": "27f1cc544822f0703e1a32c43c3111cd3ecd32845f3d3a51554c4b8ebcc0851f"
+    },
+    {
+      "path": "job-review/test_blocked_questions.py",
+      "sha256": "953135eab41c8bbb6e65b3c0ebc8f81cec9155e8480647bff4e5586cb83b92fa"
+    },
+    {
+      "path": "job-review/test_blocker_resume.py",
+      "sha256": "2acbf7ad413ad344b81691dc4c85ed12dc6984dfd27a294b5c630fddd4e6d3f0"
+    },
+    {
+      "path": "job-review/test_browser_recovery.py",
+      "sha256": "dd3d870704c3c98975def4a96bc42c380659bdd182b000377f3b0fc2d049dfa3"
+    },
+    {
+      "path": "job-review/test_chrome_access_gate.py",
+      "sha256": "38a12d7e64dc1af7132b3168be132433d1c8e9309e3aca71e2ee944d3038e30f"
+    },
+    {
+      "path": "job-review/test_codex_appserver.py",
+      "sha256": "8ebcf360c3d1df7e7c878dc1d8b73b14a0fdbcd0f67ce9291f49f18d9ca4e420"
+    },
+    {
+      "path": "job-review/test_codex_runtime.py",
+      "sha256": "5943fda81900112cd3c779fd3758e06aaa9d694e25fca508e2e9becd412d16c0"
+    },
+    {
+      "path": "job-review/test_codex_transport.py",
+      "sha256": "ab53b9ae874f136fe8da0e1feb3be87118cf8b69297e921cdd9eb078552bc383"
     },
     {
       "path": "job-review/test_device_access.py",
@@ -67,8 +843,68 @@
       "sha256": "d7f8101991c3f1b336edb279fdef92f36fd3a6d2415f69db2813679aedac4385"
     },
     {
+      "path": "job-review/test_evidence_answers.py",
+      "sha256": "64b4942f86e0ef0432e57d93ca2adca4fc05cf34db01e1face14f49b64cdad1f"
+    },
+    {
+      "path": "job-review/test_external_application_readiness.py",
+      "sha256": "80948734954827a256d63a6768416ff26315cacb7199dada92437594e951c65e"
+    },
+    {
+      "path": "job-review/test_no_browser_monitor.py",
+      "sha256": "1cd545cfdcab8d75294a09caf197fdaf0cd849209bef2abb74531546eaf30b7f"
+    },
+    {
+      "path": "job-review/test_orchestrator_failures.py",
+      "sha256": "61f70e4c50da38c3e8506a26bdb327ae7fb34c85f8f577f2ba2ef602ec207606"
+    },
+    {
+      "path": "job-review/test_pool_appserver.py",
+      "sha256": "44b47d27a34806aa8d5a6f26eaf5606c017410729715ee58a34e6453028b51a6"
+    },
+    {
+      "path": "job-review/test_pooled_browser_session.py",
+      "sha256": "99e5bfa186f8246e53b9ec2b015dff98447755ee6952b92b664e8a711f746666"
+    },
+    {
+      "path": "job-review/test_posting_recovery.py",
+      "sha256": "90181a468e8cb6bfe4a402eb74dd3e36b9238eac43d006a3a77dceed5f024a28"
+    },
+    {
       "path": "job-review/test_preflight_resource.py",
       "sha256": "0e066513a9d70b10e7e3d38f06219b8285448f3968a2997b74ce9554867989ad"
+    },
+    {
+      "path": "job-review/test_project_consent.py",
+      "sha256": "09faffc0566b68183459230aa9de5dc8f733da886b9d99bfaaf80535f07180f6"
+    },
+    {
+      "path": "job-review/test_question_browser_queue.py",
+      "sha256": "a63d43d120fd2061bd7d8e8ecd3cf044c44848e05c50b05b786b17f975d02c39"
+    },
+    {
+      "path": "job-review/test_question_pool.py",
+      "sha256": "a7cd7965cb22d351166ed96faa349057dda151dc5f97d136a353bd3a6343918e"
+    },
+    {
+      "path": "job-review/test_question_recovery.py",
+      "sha256": "de840df5f6bd60254cac686c4addf494058089fa69d5d70106353104f1f6e8b2"
+    },
+    {
+      "path": "job-review/test_question_sync_api.py",
+      "sha256": "3fab932b3dc77f7ea23ad86866b2b1ea15665bfe15d0e72699fe9b045fa5cf6a"
+    },
+    {
+      "path": "job-review/test_question_sync_snapshot.py",
+      "sha256": "01e084761c790a5243d68a9f716d232d4c6468451fe38f00cfb499dddbe28813"
+    },
+    {
+      "path": "job-review/test_question_sync_store.py",
+      "sha256": "db7e52d3b7ee455c4307125ac601067d5224759cca91ab42b8918f0c7b52e9d6"
+    },
+    {
+      "path": "job-review/test_rank_artifact.py",
+      "sha256": "04cb2417c09f29bccf29eaa184047ac98c87b0fcde5672c50203bd016d72bccf"
     },
     {
       "path": "job-review/test_ranked_cards.py",
@@ -76,31 +912,55 @@
     },
     {
       "path": "job-review/test_readiness.py",
-      "sha256": "4e785d29ab6f3542a1bc249029bcc2137a9b30c283666e0db2ae5f4df7d07662"
+      "sha256": "f2308395d27d09cb0e7320bec10dfcb9d6dbe36570d9a4dd8eb1859e9e9408e7"
+    },
+    {
+      "path": "job-review/test_readiness_recovery.py",
+      "sha256": "bab79400cec30a378cd5d98c17ae951bff581960fbaadada7189d501705ff32f"
     },
     {
       "path": "job-review/test_readiness_server.py",
-      "sha256": "7e564fc5fe1fd1988fd85ae41e6a3177141910fbc0e4c9dc52965b45998f18d8"
+      "sha256": "1dd0c733aaa97161b2a1aca823e0527fb3933d1a1df27acbe867530be53fe176"
+    },
+    {
+      "path": "job-review/test_reconcile_questions.py",
+      "sha256": "0cf4f7fb79075865b243c2ff7da29a35b0fa66298f247585a57e574a76b136a4"
     },
     {
       "path": "job-review/test_regressions.py",
       "sha256": "27032204410b4e518de5c5845330acd19eb62a05a532cec1fb01cb9470873504"
     },
     {
+      "path": "job-review/test_runtime_server.py",
+      "sha256": "943af82c40ef63fec6adbf2aed5946065628dc6a4cd0b653bbf582fb1d891681"
+    },
+    {
       "path": "job-review/test_server.py",
       "sha256": "3ca0142c473037f8f93ae17113ec524fb2e221c1ca01fca2ada530d0381180f9"
+    },
+    {
+      "path": "job-review/test_server_recovery.py",
+      "sha256": "8e3cd28b897b07b70eadf0673390860942fe0126999b8bac1308c674d47db336"
     },
     {
       "path": "job-review/test_server_startup.py",
       "sha256": "d68698c738106852b1616ec4401ebc114bcdec459787f815e39a865f50429e4f"
     },
     {
+      "path": "job-review/test_shared_browser_session.py",
+      "sha256": "fda32e48a6f7c447e0018d1418e3252d8d6e75d9a8932ea1ef0c36a67b9a9d0c"
+    },
+    {
       "path": "job-review/test_store.py",
       "sha256": "2deaba6ae4907b0b66015b90885acaca98e97f9f8e2d641fdf600dfd23c970c8"
     },
     {
+      "path": "job-review/test_submission_recovery.py",
+      "sha256": "63c47e4034c76081e879546308328d4ce46e0aa8e85ba7289f8681f0884d3334"
+    },
+    {
       "path": "job-review/test_tailscale_backend.py",
-      "sha256": "a8f972086b8e33c1ff00963562461a3439db5767b1b33ccc878ff923f1a8cc35"
+      "sha256": "45e32a7fea102fe7073692af125bd5ca9eda01e38029d0be77519b36982a2e5e"
     },
     {
       "path": "job-review/test_tasks.py",
@@ -115,60 +975,64 @@
       "sha256": "ab761b1f8c78faaaaacc309d90ec5114f6f8cbe9d9ab54de5b4e51978943ead6"
     },
     {
-      "path": "job-review/test_v1_server.py",
-      "sha256": "e63831dc07f00cfa8ccdc1734f016685416183a48888eb3658777040bc62b600"
-    },
-    {
-      "path": "job-review/test_workflow.py",
-      "sha256": "40b53a41cbdebfaa6b60cb2e6ff23ce609694538696494e07260d34a5ac13d5f"
-    },
-    {
-      "path": "job-review/tls_gateway.py",
-      "sha256": "a28127ae855e3a5208e955cb4d32abc1d1314d36952f97d95de83608d7e4b698"
-    },
-    {
-      "path": "job-review/workflow.py",
-      "sha256": "0c509eb8510550797beae5465d99cf7dd40da485efd88607e11911fc965c8a67"
-    },
-    {
-      "path": "job-review/README.md",
-      "sha256": "3ac7359ccadd636540d6b774b362f434648cd82d0fd3320e17009055c997183b"
-    },
-    {
-      "path": "job-review/CONTRACT.md",
-      "sha256": "2aa89008103ace60c7c2087a4a90a2ead664a7762d9564b516ab67ca1f6be1bb"
-    },
-    {
-      "path": "job-review/CONTRACT_V1.md",
-      "sha256": "3525e948779ef01ae650811396d9fff4ee9d7f0c061e9dde5b12dff17a90123e"
-    },
-    {
-      "path": "job-review/index.html",
-      "sha256": "37d8871ce98ec137fcdaedec67d631545f5169b2775b1a5d09dc0353be0ed290"
-    },
-    {
       "path": "job-review/test_ui.js",
       "sha256": "10469a5a00d0a861219c595e65078789921c0eda17404afbc42f54b466fa78c1"
     },
     {
-      "path": "job-review/device-stack.example.json",
-      "sha256": "7a6bacaad8618f936146afb3420553407ba325f7c90b27a75ef0f53307cb9fa5"
+      "path": "job-review/test_unblock_instructions.py",
+      "sha256": "8ba9e01c2d23808f8af50aee0753fc6364dad5aad62912a9485731b7f0a5a8a8"
     },
     {
-      "path": "job-review/fixtures/auth.json",
-      "sha256": "fbe56e2fbd3c8de310277da8e33755f2eab27de75958799b0106d8b283d3cb94"
+      "path": "job-review/test_upload_approval.py",
+      "sha256": "5b92ddc87185fb86aced4b4bec8b747afb5c58a5970f55e7686a2ea7b8c5219c"
     },
     {
-      "path": "job-review/fixtures/health.json",
-      "sha256": "353a79b593bfaeb7c8dfc6c9c0608079861a09aa3c2183fa4b68ebce7cbba240"
+      "path": "job-review/test_v1_server.py",
+      "sha256": "856f952ed4e66c46763b147234e8450df5d51355d38dbdd23a5a96f6c5a7c411"
     },
     {
-      "path": "job-review/fixtures/ranked-flashcard.json",
-      "sha256": "cc2bdf1fa2de088022859aaa4899468d4244c2445b63e357d312f4f6ec9586c1"
+      "path": "job-review/test_worker_power.py",
+      "sha256": "a2ab0d32594078161061d7a89831c0073f5018ebea0d16dd57c49487a058c648"
     },
     {
-      "path": "job-review/fixtures/v1-http.json",
-      "sha256": "df97bdb5300162365563d40d260e545fba61be90e6d543d5db46627f72012667"
+      "path": "job-review/test_worker_runner.py",
+      "sha256": "306f72e5e754ecb893f6cdccb1f640343b1b716c1debea8406936912fb004d58"
+    },
+    {
+      "path": "job-review/test_worker_startup.py",
+      "sha256": "a92f3808522e2ef32e33c5e1f858d2c74a45f773eff66ecc879eb39dd0708b47"
+    },
+    {
+      "path": "job-review/test_workflow.py",
+      "sha256": "9484d0dbbc81ba7c33cb9a513b2c3014e59b226c52cc4c477bfcb2cf97b73449"
+    },
+    {
+      "path": "job-review/tls_gateway.py",
+      "sha256": "4e8d47bf55a15d095ccb1e7f580ef55a5b095490f9a3cb6e96b2bc0af5bf6cc9"
+    },
+    {
+      "path": "job-review/tools/application_pool_probe.py",
+      "sha256": "1564b988ec74544b679db392d8e148392261df6bddb245c0285a0c49e36eb46f"
+    },
+    {
+      "path": "job-review/unblock_instructions.py",
+      "sha256": "140e4f9d22bf1764d6f71ef960678cee245abc2f02e8d091efe8b62cf9ca782d"
+    },
+    {
+      "path": "job-review/upload_approval.py",
+      "sha256": "cecf62c9a683610c337e7ba67fb5d681e2f268632e313714ca130cf968fd0fe9"
+    },
+    {
+      "path": "job-review/worker_power.py",
+      "sha256": "0dccb3cd60d1cc1e77768265b905a0637aef3415244ee9773da722d1e8525a7c"
+    },
+    {
+      "path": "job-review/worker_runner.py",
+      "sha256": "a32cd06b48a5df690f9c14df358977f2ea54ffccfac50a026e5cac752635ed2f"
+    },
+    {
+      "path": "job-review/workflow.py",
+      "sha256": "d2e1cbe5bbdd946460bf954ad515b563cb0350822d003f802d97021c9ece67d2"
     }
   ]
 }

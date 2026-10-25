@@ -29,3 +29,17 @@ initial-catalog.json
 briefs.json
 workflow.json
 .DS_Store
+
+# Native client build products and local signing/user state
+.venv*/
+.build*/
+.swiftpm/
+dist/
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xcarchive
+*.ipa
+*.dSYM/
+verification/

@@ -1,11 +1,14 @@
+> Historical Linux deployment task. This source update does not run these steps.
+> Browser adapters now exist for the supported Mac environment; Linux needs its own verification.
+
 Set up this Linux machine as the backend host for my jobswipe / Job Review
 system. Execute the setup and verification; do not stop at a design or a list of
 commands. Keep changes confined to this deployment and preserve other services.
 
 ## Source and current system
 
-Clone the private repository `zzzhouzhenzz/job-review-backend` from GitHub into
-`/home/zz/ml-workspace/job-review-backend`, if that directory does not already
+Clone the repository `zzzhouzhenzz/job-review-backend` from GitHub into
+a project directory chosen for this host, if that directory does not already
 exist. If it exists, inspect its remote and changes before reusing it. Never
 reset unrelated work. Use the immutable source commit supplied with this prompt
 if present; otherwise record the fetched commit. Verify `SOURCE_MANIFEST.json`.
@@ -19,8 +22,8 @@ The backend already implements SQLite persistence, authenticated APIs,
 idempotent commands, application tracking, typed questions/answers, ranking
 contracts, health checks, and durable task scheduling. The iOS app already uses
 this API. Preserve its contracts and retry semantics. Agent, LLM, and Chrome
-execution adapters are deliberately unimplemented and must remain disabled for
-this deployment. A queued Apply is not an employer submission.
+execution adapters now exist for the supported Mac environment but must remain
+disabled for this Linux deployment until target-host support is verified. A queued Apply is not an employer submission.
 
 GitHub is for code, tests, templates, and nonsecret documentation only. Production
 databases, decisions, research, browser profiles, cookies, tokens, private keys,
@@ -109,7 +112,7 @@ support proves Linux support, and do not invent a tool/API or use a second login
 session. If supported, verify a read-only page read from the same window visible
 in noVNC. If unsupported, report the exact limitation while completing the API
 and remote desktop. Do not claim the backend Chrome health check is ready while
-its adapter is unimplemented. Maintain one browser-controller owner at a time,
+its target-host adapter has not been verified. Maintain one browser-controller owner at a time,
 with an explicit pause/takeover process for human interaction.
 
 ## Production data and cutover
@@ -153,7 +156,7 @@ Verify and record:
 - Exact-job Apply, same-ID replay, answer types, and cancellation using only
   fictional test data; no duplicate process after a lost response or retry.
 - The live API remains available while Chrome/agents are unavailable, and health
-  reports `not_configured` honestly until adapters exist.
+  reports its disabled or unverified state honestly until target-host adapters pass verification.
 - Services restart cleanly and persist without an SSH terminal. Inspect boot
   configuration; do not reboot the whole machine without my confirmation.
 - The desktop works from my Mac, accepts mouse/keyboard input for a harmless
@@ -161,7 +164,7 @@ Verify and record:
   the profile across a service restart. Ask me for a remote observation only
   when your tools cannot verify it. Do not claim a local check proves Mac access.
 - After my login, the same Chrome session can read a LinkedIn job posting. Keep
-  actual browser observation separate from unimplemented backend readiness.
+  actual browser observation separate from verified backend readiness.
 - No raw API, VNC, X, or browser-debugging listener is exposed publicly.
 - Migrated production history matches the final snapshot, and the iPhone can
   read it over Wi-Fi and cellular when available for testing.
