@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "revision": "fictional-envelope-digest",
+  "complete": true,
+  "next_cursor": null,
+  "token": "fictional-review-token",
+  "question_sync": {
+    "sync": {
+      "state": "updating",
+      "revision": 16,
+      "pool_revision": 4
+    },
+    "shared_questions": null,
+    "questions": null,
+    "processes": null,
+    "historical_unlinked_question_ids": null
+  }
+}
