@@ -1,0 +1,288 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		000000000000000000000009 /* ReviewCore in Frameworks */ = {isa = PBXBuildFile; productRef = 00000000000000000000000B /* ReviewCore */; };
+		0000000000000000000000C8 /* JobReviewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000064 /* JobReviewApp.swift */; };
+		0000000000000000000000C9 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000065 /* AppModel.swift */; };
+		0000000000000000000000CA /* ReviewViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000066 /* ReviewViews.swift */; };
+		0000000000000000000000CB /* SavedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000067 /* SavedViews.swift */; };
+		0000000000000000000000CC /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000068 /* SettingsView.swift */; };
+		0000000000000000000000CD /* SecureTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000000069 /* SecureTokenStore.swift */; };
+		0000000000000000000000CE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006A /* Assets.xcassets */; };
+		0000000000000000000000CF /* WorkflowViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006C /* WorkflowViews.swift */; };
+		0000000000000000000000D0 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006D /* Fonts */; };
+		0000000000000000000000D1 /* QuestionDraftSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00000000000000000000006E /* QuestionDraftSync.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		000000000000000000000005 /* jobswipe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jobswipe.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000064 /* JobReviewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobReviewApp.swift; sourceTree = "<group>"; };
+		000000000000000000000065 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		000000000000000000000066 /* ReviewViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViews.swift; sourceTree = "<group>"; };
+		000000000000000000000067 /* SavedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedViews.swift; sourceTree = "<group>"; };
+		000000000000000000000068 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		000000000000000000000069 /* SecureTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureTokenStore.swift; sourceTree = "<group>"; };
+		00000000000000000000006A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		00000000000000000000006B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		00000000000000000000006C /* WorkflowViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkflowViews.swift; sourceTree = "<group>"; };
+		00000000000000000000006D /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fonts; sourceTree = "<group>"; };
+		00000000000000000000006E /* QuestionDraftSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionDraftSync.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		000000000000000000000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000000009 /* ReviewCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		000000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000003 /* App */,
+				000000000000000000000004 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		000000000000000000000003 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000064 /* JobReviewApp.swift */,
+				000000000000000000000065 /* AppModel.swift */,
+				000000000000000000000066 /* ReviewViews.swift */,
+				000000000000000000000067 /* SavedViews.swift */,
+				000000000000000000000068 /* SettingsView.swift */,
+				000000000000000000000069 /* SecureTokenStore.swift */,
+				00000000000000000000006A /* Assets.xcassets */,
+				00000000000000000000006B /* Info.plist */,
+				00000000000000000000006C /* WorkflowViews.swift */,
+				00000000000000000000006D /* Fonts */,
+				00000000000000000000006E /* QuestionDraftSync.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		000000000000000000000004 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000000005 /* jobswipe.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		00000000000000000000000C /* JobReview */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 00000000000000000000000E /* Build configuration list for PBXNativeTarget "JobReview" */;
+			buildPhases = (
+				000000000000000000000006 /* Sources */,
+				000000000000000000000008 /* Frameworks */,
+				000000000000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JobReview;
+			packageProductDependencies = (
+				00000000000000000000000B /* ReviewCore */,
+			);
+			productName = jobswipe;
+			productReference = 000000000000000000000005 /* jobswipe.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					00000000000000000000000C = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 00000000000000000000000D /* Build configuration list for PBXProject "JobReview" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 000000000000000000000002;
+			packageReferences = (
+				00000000000000000000000A /* XCLocalSwiftPackageReference "." */,
+			);
+			productRefGroup = 000000000000000000000004 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				00000000000000000000000C /* JobReview */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		000000000000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0000000000000000000000CE /* Assets.xcassets in Resources */,
+				0000000000000000000000D0 /* Fonts in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		000000000000000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0000000000000000000000C8 /* JobReviewApp.swift in Sources */,
+				0000000000000000000000C9 /* AppModel.swift in Sources */,
+				0000000000000000000000CA /* ReviewViews.swift in Sources */,
+				0000000000000000000000CB /* SavedViews.swift in Sources */,
+				0000000000000000000000CC /* SettingsView.swift in Sources */,
+				0000000000000000000000CD /* SecureTokenStore.swift in Sources */,
+				0000000000000000000000CF /* WorkflowViews.swift in Sources */,
+				0000000000000000000000D1 /* QuestionDraftSync.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		000000000000000000000014 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		000000000000000000000015 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		000000000000000000000016 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 12;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.jobreview.personal;
+				PRODUCT_NAME = jobswipe;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		000000000000000000000017 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 12;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = App/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.jobreview.personal;
+				PRODUCT_NAME = jobswipe;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		00000000000000000000000D /* Build configuration list for PBXProject "JobReview" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000014 /* Debug */,
+				000000000000000000000015 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		00000000000000000000000E /* Build configuration list for PBXNativeTarget "JobReview" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000000016 /* Debug */,
+				000000000000000000000017 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		00000000000000000000000A /* XCLocalSwiftPackageReference "." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = .;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		00000000000000000000000B /* ReviewCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 00000000000000000000000A /* XCLocalSwiftPackageReference "." */;
+			productName = ReviewCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 000000000000000000000001 /* Project object */;
+}

@@ -1,0 +1,823 @@
+{
+  "token": "demo-session",
+  "companies": [
+    {
+      "id": "northstar",
+      "name": "Northstar Systems",
+      "data": {
+        "summary": "Build dependable tools for data teams.",
+        "description": "Northstar Systems builds dependable tools for data teams. This is a fictional company for app previews.",
+        "coverage": "Fictional sample data. These jobs are not open positions."
+      },
+      "excluded": false,
+      "research_status": "none",
+      "note": "",
+      "revision": 1
+    },
+    {
+      "id": "canopy",
+      "name": "Canopy Labs",
+      "data": {
+        "summary": "Build software for clean energy operators.",
+        "description": "Canopy Labs builds software for clean energy operators. This is a fictional company for app previews.",
+        "coverage": "Fictional sample data. These jobs are not open positions."
+      },
+      "excluded": false,
+      "research_status": "none",
+      "note": "",
+      "revision": 1
+    },
+    {
+      "id": "fieldwork",
+      "name": "Fieldwork Studio",
+      "data": {
+        "summary": "Make practical software for small businesses.",
+        "description": "Fieldwork Studio makes practical software for small businesses. This is a fictional company for app previews.",
+        "coverage": "Fictional sample data. These jobs are not open positions."
+      },
+      "excluded": false,
+      "research_status": "none",
+      "note": "",
+      "revision": 1
+    }
+  ],
+  "jobs": [
+    {
+      "key": "northstar:demo-1",
+      "company_id": "northstar",
+      "job_id": "demo-1",
+      "data": {
+        "rank": 1,
+        "title": "Senior Software Engineer, Data Platform",
+        "url": "https://example.com/northstar/demo-1",
+        "location": "Remote in the US",
+        "arrangement": "See the sample location. Real work terms require a source.",
+        "salary": "Sample only. Pay is not stated.",
+        "level": "Exact sample title shown above.",
+        "strengths": [
+          "Backend and data pipeline work is relevant."
+        ],
+        "gaps": [
+          "Production Kafka ownership needs confirmation."
+        ],
+        "sources": [
+          {
+            "label": "Sample link",
+            "url": "https://example.com"
+          }
+        ],
+        "availability": "Fictional sample. Do not apply.",
+        "brief": {
+          "work": "Own data ingestion and platform APIs.",
+          "fit": "Backend and data pipeline work is relevant.",
+          "gap": "Production Kafka ownership needs confirmation.",
+          "arrangement": "Remote in the US"
+        },
+        "requirements": [
+          "Fictional requirement: experience building data ingestion services.",
+          "Fictional requirement: design and maintain backend APIs."
+        ]
+      },
+      "revision": 1,
+      "decision": "pending",
+      "note": "",
+      "changed": false
+    },
+    {
+      "key": "northstar:demo-2",
+      "company_id": "northstar",
+      "job_id": "demo-2",
+      "data": {
+        "rank": 2,
+        "title": "Senior Software Engineer, Infrastructure",
+        "url": "https://example.com/northstar/demo-2",
+        "location": "Seattle, WA \u00b7 Hybrid",
+        "arrangement": "See the sample location. Real work terms require a source.",
+        "salary": "Sample only. Pay is not stated.",
+        "level": "Exact sample title shown above.",
+        "strengths": [
+          "Distributed service operations match the work."
+        ],
+        "gaps": [
+          "Kubernetes depth needs confirmation."
+        ],
+        "sources": [
+          {
+            "label": "Sample link",
+            "url": "https://example.com"
+          }
+        ],
+        "availability": "Fictional sample. Do not apply.",
+        "brief": {
+          "work": "Build shared services and improve reliability.",
+          "fit": "Distributed service operations match the work.",
+          "gap": "Kubernetes depth needs confirmation.",
+          "arrangement": "Seattle, WA \u00b7 Hybrid"
+        },
+        "requirements": [
+          "Fictional requirement: experience operating distributed services.",
+          "Fictional requirement: investigate and resolve service failures."
+        ]
+      },
+      "revision": 1,
+      "decision": "pending",
+      "note": "",
+      "changed": false
+    },
+    {
+      "key": "northstar:demo-3",
+      "company_id": "northstar",
+      "job_id": "demo-3",
+      "data": {
+        "rank": 3,
+        "title": "Staff Software Engineer, Developer Tools",
+        "url": "https://example.com/northstar/demo-3",
+        "location": "San Francisco, CA \u00b7 Hybrid",
+        "arrangement": "See the sample location. Real work terms require a source.",
+        "salary": "Sample only. Pay is not stated.",
+        "level": "Exact sample title shown above.",
+        "strengths": [
+          "Platform API and release work is relevant."
+        ],
+        "gaps": [
+          "Staff scope and build tooling depth need review."
+        ],
+        "sources": [
+          {
+            "label": "Sample link",
+            "url": "https://example.com"
+          }
+        ],
+        "availability": "Fictional sample. Do not apply.",
+        "brief": {
+          "work": "Improve builds, tests, and developer workflows.",
+          "fit": "Platform API and release work is relevant.",
+          "gap": "Staff scope and build tooling depth need review.",
+          "arrangement": "San Francisco, CA \u00b7 Hybrid"
+        },
+        "requirements": [
+          "Fictional requirement: build developer tools used by multiple teams.",
+          "Fictional requirement: lead technical design across projects."
+        ]
+      },
+      "revision": 1,
+      "decision": "pending",
+      "note": "",
+      "changed": false
+    },
+    {
+      "key": "canopy:demo-1",
+      "company_id": "canopy",
+      "job_id": "demo-1",
+      "data": {
+        "rank": 1,
+        "title": "Senior Backend Engineer",
+        "url": "https://example.com/canopy/demo-1",
+        "location": "Remote in the US",
+        "arrangement": "See the sample location. Real work terms require a source.",
+        "salary": "Sample only. Pay is not stated.",
+        "level": "Exact sample title shown above.",
+        "strengths": [
+          "Backend service design matches the work."
+        ],
+        "gaps": [
+          "Energy market knowledge is not confirmed."
+        ],
+        "sources": [
+          {
+            "label": "Sample link",
+            "url": "https://example.com"
+          }
+        ],
+        "availability": "Fictional sample. Do not apply.",
+        "brief": {
+          "work": "Build APIs for energy operations.",
+          "fit": "Backend service design matches the work.",
+          "gap": "Energy market knowledge is not confirmed.",
+          "arrangement": "Remote in the US"
+        },
+        "requirements": [
+          "Fictional requirement: build and test backend services.",
+          "Fictional requirement: design relational data models."
+        ]
+      },
+      "revision": 1,
+      "decision": "pending",
+      "note": "",
+      "changed": false
+    },
+    {
+      "key": "canopy:demo-2",
+      "company_id": "canopy",
+      "job_id": "demo-2",
+      "data": {
+        "rank": 2,
+        "title": "Senior Software Engineer, Data Systems",
+        "url": "https://example.com/canopy/demo-2",
+        "location": "New York, NY \u00b7 Hybrid",
+        "arrangement": "See the sample location. Real work terms require a source.",
+        "salary": "Sample only. Pay is not stated.",
+        "level": "Exact sample title shown above.",
+        "strengths": [
+          "Data pipeline operations are relevant."
+        ],
+        "gaps": [
+          "Flink production experience is not confirmed."
+        ],
+        "sources": [
+          {
+            "label": "Sample link",
+            "url": "https://example.com"
+          }
+        ],
+        "availability": "Fictional sample. Do not apply.",
+        "brief": {
+          "work": "Build reliable event and analytics systems.",
+          "fit": "Data pipeline operations are relevant.",
+          "gap": "Flink production experience is not confirmed.",
+          "arrangement": "New York, NY \u00b7 Hybrid"
+        },
+        "requirements": [
+          "Fictional requirement: build reliable data processing systems.",
+          "Fictional requirement: investigate data quality problems."
+        ]
+      },
+      "revision": 1,
+      "decision": "pending",
+      "note": "",
+      "changed": false
+    },
+    {
+      "key": "canopy:demo-3",
+      "company_id": "canopy",
+      "job_id": "demo-3",
+      "data": {
+        "rank": 3,
+        "title": "Senior Platform Engineer",
+        "url": "https://example.com/canopy/demo-3",
+        "location": "Boston, MA \u00b7 Hybrid",
+        "arrangement": "See the sample location. Real work terms require a source.",
+        "salary": "Sample only. Pay is not stated.",
+        "level": "Exact sample title shown above.",
+        "strengths": [
+          "Release and operations work match the role."
+        ],
+        "gaps": [
+          "Terraform experience needs confirmation."
+        ],
+        "sources": [
+          {
+            "label": "Sample link",
+            "url": "https://example.com"
+          }
+        ],
+        "availability": "Fictional sample. Do not apply.",
+        "brief": {
+          "work": "Improve service delivery and observability.",
+          "fit": "Release and operations work match the role.",
+          "gap": "Terraform experience needs confirmation.",
+          "arrangement": "Boston, MA \u00b7 Hybrid"
+        },
+        "requirements": [
+          "Fictional requirement: develop shared platform services.",
+          "Fictional requirement: improve deployment reliability."
+        ]
+      },
+      "revision": 1,
+      "decision": "pending",
+      "note": "",
+      "changed": false
+    },
+    {
+      "key": "fieldwork:demo-1",
+      "company_id": "fieldwork",
+      "job_id": "demo-1",
+      "data": {
+        "rank": 1,
+        "title": "Senior Software Engineer, Core Platform",
+        "url": "https://example.com/fieldwork/demo-1",
+        "location": "Remote in the US",
+        "arrangement": "See the sample location. Real work terms require a source.",
+        "salary": "Sample only. Pay is not stated.",
+        "level": "Exact sample title shown above.",
+        "strengths": [
+          "Service and database design match the work."
+        ],
+        "gaps": [
+          "The required Ruby experience is not confirmed."
+        ],
+        "sources": [
+          {
+            "label": "Sample link",
+            "url": "https://example.com"
+          }
+        ],
+        "availability": "Fictional sample. Do not apply.",
+        "brief": {
+          "work": "Build shared APIs for product teams.",
+          "fit": "Service and database design match the work.",
+          "gap": "The required Ruby experience is not confirmed.",
+          "arrangement": "Remote in the US"
+        },
+        "requirements": [
+          "Fictional requirement: design production service APIs.",
+          "Fictional requirement: test changes to shared platform behavior."
+        ]
+      },
+      "revision": 1,
+      "decision": "pending",
+      "note": "",
+      "changed": false
+    },
+    {
+      "key": "fieldwork:demo-2",
+      "company_id": "fieldwork",
+      "job_id": "demo-2",
+      "data": {
+        "rank": 2,
+        "title": "Senior Software Engineer, Search",
+        "url": "https://example.com/fieldwork/demo-2",
+        "location": "Austin, TX \u00b7 Hybrid",
+        "arrangement": "See the sample location. Real work terms require a source.",
+        "salary": "Sample only. Pay is not stated.",
+        "level": "Exact sample title shown above.",
+        "strengths": [
+          "Backend and data pipeline work is relevant."
+        ],
+        "gaps": [
+          "Search ranking experience needs confirmation."
+        ],
+        "sources": [
+          {
+            "label": "Sample link",
+            "url": "https://example.com"
+          }
+        ],
+        "availability": "Fictional sample. Do not apply.",
+        "brief": {
+          "work": "Improve search quality and indexing.",
+          "fit": "Backend and data pipeline work is relevant.",
+          "gap": "Search ranking experience needs confirmation.",
+          "arrangement": "Austin, TX \u00b7 Hybrid"
+        },
+        "requirements": [
+          "Fictional requirement: develop search and retrieval services.",
+          "Fictional requirement: measure search quality and latency."
+        ]
+      },
+      "revision": 1,
+      "decision": "pending",
+      "note": "",
+      "changed": false
+    },
+    {
+      "key": "fieldwork:demo-3",
+      "company_id": "fieldwork",
+      "job_id": "demo-3",
+      "data": {
+        "rank": 3,
+        "title": "Senior Software Engineer, Reliability",
+        "url": "https://example.com/fieldwork/demo-3",
+        "location": "Remote in the US",
+        "arrangement": "See the sample location. Real work terms require a source.",
+        "salary": "Sample only. Pay is not stated.",
+        "level": "Exact sample title shown above.",
+        "strengths": [
+          "Distributed service operations are relevant."
+        ],
+        "gaps": [
+          "On-call schedule is not stated."
+        ],
+        "sources": [
+          {
+            "label": "Sample link",
+            "url": "https://example.com"
+          }
+        ],
+        "availability": "Fictional sample. Do not apply.",
+        "brief": {
+          "work": "Reduce failures and improve recovery.",
+          "fit": "Distributed service operations are relevant.",
+          "gap": "On-call schedule is not stated.",
+          "arrangement": "Remote in the US"
+        },
+        "requirements": [
+          "Fictional requirement: improve service observability.",
+          "Fictional requirement: investigate production reliability incidents."
+        ]
+      },
+      "revision": 1,
+      "decision": "pending",
+      "note": "",
+      "changed": false
+    }
+  ],
+  "queue": [],
+  "counts": {
+    "companies": 3,
+    "jobs": 9,
+    "all": 9,
+    "inbox": 9,
+    "later": 0,
+    "ready": 0,
+    "queue": 0,
+    "excluded": 0,
+    "applied": 0,
+    "flashcards": 3,
+    "card_jobs": 9,
+    "reviewed_cards": 0
+  },
+  "flashcards": [
+    {
+      "company_id": "northstar",
+      "revision": 1,
+      "jobs": [
+        {
+          "key": "northstar:demo-1",
+          "company_id": "northstar",
+          "job_id": "demo-1",
+          "data": {
+            "rank": 1,
+            "title": "Senior Software Engineer, Data Platform",
+            "url": "https://example.com/northstar/demo-1",
+            "location": "Remote in the US",
+            "arrangement": "See the sample location. Real work terms require a source.",
+            "salary": "Sample only. Pay is not stated.",
+            "level": "Exact sample title shown above.",
+            "strengths": [
+              "Backend and data pipeline work is relevant."
+            ],
+            "gaps": [
+              "Production Kafka ownership needs confirmation."
+            ],
+            "sources": [
+              {
+                "label": "Sample link",
+                "url": "https://example.com"
+              }
+            ],
+            "availability": "Fictional sample. Do not apply.",
+            "brief": {
+              "work": "Own data ingestion and platform APIs.",
+              "fit": "Backend and data pipeline work is relevant.",
+              "gap": "Production Kafka ownership needs confirmation.",
+              "arrangement": "Remote in the US"
+            },
+            "requirements": [
+              "Fictional requirement: experience building data ingestion services.",
+              "Fictional requirement: design and maintain backend APIs."
+            ]
+          },
+          "revision": 1,
+          "decision": "pending",
+          "note": "",
+          "changed": false
+        },
+        {
+          "key": "northstar:demo-2",
+          "company_id": "northstar",
+          "job_id": "demo-2",
+          "data": {
+            "rank": 2,
+            "title": "Senior Software Engineer, Infrastructure",
+            "url": "https://example.com/northstar/demo-2",
+            "location": "Seattle, WA \u00b7 Hybrid",
+            "arrangement": "See the sample location. Real work terms require a source.",
+            "salary": "Sample only. Pay is not stated.",
+            "level": "Exact sample title shown above.",
+            "strengths": [
+              "Distributed service operations match the work."
+            ],
+            "gaps": [
+              "Kubernetes depth needs confirmation."
+            ],
+            "sources": [
+              {
+                "label": "Sample link",
+                "url": "https://example.com"
+              }
+            ],
+            "availability": "Fictional sample. Do not apply.",
+            "brief": {
+              "work": "Build shared services and improve reliability.",
+              "fit": "Distributed service operations match the work.",
+              "gap": "Kubernetes depth needs confirmation.",
+              "arrangement": "Seattle, WA \u00b7 Hybrid"
+            },
+            "requirements": [
+              "Fictional requirement: experience operating distributed services.",
+              "Fictional requirement: investigate and resolve service failures."
+            ]
+          },
+          "revision": 1,
+          "decision": "pending",
+          "note": "",
+          "changed": false
+        },
+        {
+          "key": "northstar:demo-3",
+          "company_id": "northstar",
+          "job_id": "demo-3",
+          "data": {
+            "rank": 3,
+            "title": "Staff Software Engineer, Developer Tools",
+            "url": "https://example.com/northstar/demo-3",
+            "location": "San Francisco, CA \u00b7 Hybrid",
+            "arrangement": "See the sample location. Real work terms require a source.",
+            "salary": "Sample only. Pay is not stated.",
+            "level": "Exact sample title shown above.",
+            "strengths": [
+              "Platform API and release work is relevant."
+            ],
+            "gaps": [
+              "Staff scope and build tooling depth need review."
+            ],
+            "sources": [
+              {
+                "label": "Sample link",
+                "url": "https://example.com"
+              }
+            ],
+            "availability": "Fictional sample. Do not apply.",
+            "brief": {
+              "work": "Improve builds, tests, and developer workflows.",
+              "fit": "Platform API and release work is relevant.",
+              "gap": "Staff scope and build tooling depth need review.",
+              "arrangement": "San Francisco, CA \u00b7 Hybrid"
+            },
+            "requirements": [
+              "Fictional requirement: build developer tools used by multiple teams.",
+              "Fictional requirement: lead technical design across projects."
+            ]
+          },
+          "revision": 1,
+          "decision": "pending",
+          "note": "",
+          "changed": false
+        }
+      ],
+      "remaining_jobs": 3
+    },
+    {
+      "company_id": "canopy",
+      "revision": 1,
+      "jobs": [
+        {
+          "key": "canopy:demo-1",
+          "company_id": "canopy",
+          "job_id": "demo-1",
+          "data": {
+            "rank": 1,
+            "title": "Senior Backend Engineer",
+            "url": "https://example.com/canopy/demo-1",
+            "location": "Remote in the US",
+            "arrangement": "See the sample location. Real work terms require a source.",
+            "salary": "Sample only. Pay is not stated.",
+            "level": "Exact sample title shown above.",
+            "strengths": [
+              "Backend service design matches the work."
+            ],
+            "gaps": [
+              "Energy market knowledge is not confirmed."
+            ],
+            "sources": [
+              {
+                "label": "Sample link",
+                "url": "https://example.com"
+              }
+            ],
+            "availability": "Fictional sample. Do not apply.",
+            "brief": {
+              "work": "Build APIs for energy operations.",
+              "fit": "Backend service design matches the work.",
+              "gap": "Energy market knowledge is not confirmed.",
+              "arrangement": "Remote in the US"
+            },
+            "requirements": [
+              "Fictional requirement: build and test backend services.",
+              "Fictional requirement: design relational data models."
+            ]
+          },
+          "revision": 1,
+          "decision": "pending",
+          "note": "",
+          "changed": false
+        },
+        {
+          "key": "canopy:demo-2",
+          "company_id": "canopy",
+          "job_id": "demo-2",
+          "data": {
+            "rank": 2,
+            "title": "Senior Software Engineer, Data Systems",
+            "url": "https://example.com/canopy/demo-2",
+            "location": "New York, NY \u00b7 Hybrid",
+            "arrangement": "See the sample location. Real work terms require a source.",
+            "salary": "Sample only. Pay is not stated.",
+            "level": "Exact sample title shown above.",
+            "strengths": [
+              "Data pipeline operations are relevant."
+            ],
+            "gaps": [
+              "Flink production experience is not confirmed."
+            ],
+            "sources": [
+              {
+                "label": "Sample link",
+                "url": "https://example.com"
+              }
+            ],
+            "availability": "Fictional sample. Do not apply.",
+            "brief": {
+              "work": "Build reliable event and analytics systems.",
+              "fit": "Data pipeline operations are relevant.",
+              "gap": "Flink production experience is not confirmed.",
+              "arrangement": "New York, NY \u00b7 Hybrid"
+            },
+            "requirements": [
+              "Fictional requirement: build reliable data processing systems.",
+              "Fictional requirement: investigate data quality problems."
+            ]
+          },
+          "revision": 1,
+          "decision": "pending",
+          "note": "",
+          "changed": false
+        },
+        {
+          "key": "canopy:demo-3",
+          "company_id": "canopy",
+          "job_id": "demo-3",
+          "data": {
+            "rank": 3,
+            "title": "Senior Platform Engineer",
+            "url": "https://example.com/canopy/demo-3",
+            "location": "Boston, MA \u00b7 Hybrid",
+            "arrangement": "See the sample location. Real work terms require a source.",
+            "salary": "Sample only. Pay is not stated.",
+            "level": "Exact sample title shown above.",
+            "strengths": [
+              "Release and operations work match the role."
+            ],
+            "gaps": [
+              "Terraform experience needs confirmation."
+            ],
+            "sources": [
+              {
+                "label": "Sample link",
+                "url": "https://example.com"
+              }
+            ],
+            "availability": "Fictional sample. Do not apply.",
+            "brief": {
+              "work": "Improve service delivery and observability.",
+              "fit": "Release and operations work match the role.",
+              "gap": "Terraform experience needs confirmation.",
+              "arrangement": "Boston, MA \u00b7 Hybrid"
+            },
+            "requirements": [
+              "Fictional requirement: develop shared platform services.",
+              "Fictional requirement: improve deployment reliability."
+            ]
+          },
+          "revision": 1,
+          "decision": "pending",
+          "note": "",
+          "changed": false
+        }
+      ],
+      "remaining_jobs": 3
+    },
+    {
+      "company_id": "fieldwork",
+      "revision": 1,
+      "jobs": [
+        {
+          "key": "fieldwork:demo-1",
+          "company_id": "fieldwork",
+          "job_id": "demo-1",
+          "data": {
+            "rank": 1,
+            "title": "Senior Software Engineer, Core Platform",
+            "url": "https://example.com/fieldwork/demo-1",
+            "location": "Remote in the US",
+            "arrangement": "See the sample location. Real work terms require a source.",
+            "salary": "Sample only. Pay is not stated.",
+            "level": "Exact sample title shown above.",
+            "strengths": [
+              "Service and database design match the work."
+            ],
+            "gaps": [
+              "The required Ruby experience is not confirmed."
+            ],
+            "sources": [
+              {
+                "label": "Sample link",
+                "url": "https://example.com"
+              }
+            ],
+            "availability": "Fictional sample. Do not apply.",
+            "brief": {
+              "work": "Build shared APIs for product teams.",
+              "fit": "Service and database design match the work.",
+              "gap": "The required Ruby experience is not confirmed.",
+              "arrangement": "Remote in the US"
+            },
+            "requirements": [
+              "Fictional requirement: design production service APIs.",
+              "Fictional requirement: test changes to shared platform behavior."
+            ]
+          },
+          "revision": 1,
+          "decision": "pending",
+          "note": "",
+          "changed": false
+        },
+        {
+          "key": "fieldwork:demo-2",
+          "company_id": "fieldwork",
+          "job_id": "demo-2",
+          "data": {
+            "rank": 2,
+            "title": "Senior Software Engineer, Search",
+            "url": "https://example.com/fieldwork/demo-2",
+            "location": "Austin, TX \u00b7 Hybrid",
+            "arrangement": "See the sample location. Real work terms require a source.",
+            "salary": "Sample only. Pay is not stated.",
+            "level": "Exact sample title shown above.",
+            "strengths": [
+              "Backend and data pipeline work is relevant."
+            ],
+            "gaps": [
+              "Search ranking experience needs confirmation."
+            ],
+            "sources": [
+              {
+                "label": "Sample link",
+                "url": "https://example.com"
+              }
+            ],
+            "availability": "Fictional sample. Do not apply.",
+            "brief": {
+              "work": "Improve search quality and indexing.",
+              "fit": "Backend and data pipeline work is relevant.",
+              "gap": "Search ranking experience needs confirmation.",
+              "arrangement": "Austin, TX \u00b7 Hybrid"
+            },
+            "requirements": [
+              "Fictional requirement: develop search and retrieval services.",
+              "Fictional requirement: measure search quality and latency."
+            ]
+          },
+          "revision": 1,
+          "decision": "pending",
+          "note": "",
+          "changed": false
+        },
+        {
+          "key": "fieldwork:demo-3",
+          "company_id": "fieldwork",
+          "job_id": "demo-3",
+          "data": {
+            "rank": 3,
+            "title": "Senior Software Engineer, Reliability",
+            "url": "https://example.com/fieldwork/demo-3",
+            "location": "Remote in the US",
+            "arrangement": "See the sample location. Real work terms require a source.",
+            "salary": "Sample only. Pay is not stated.",
+            "level": "Exact sample title shown above.",
+            "strengths": [
+              "Distributed service operations are relevant."
+            ],
+            "gaps": [
+              "On-call schedule is not stated."
+            ],
+            "sources": [
+              {
+                "label": "Sample link",
+                "url": "https://example.com"
+              }
+            ],
+            "availability": "Fictional sample. Do not apply.",
+            "brief": {
+              "work": "Reduce failures and improve recovery.",
+              "fit": "Distributed service operations are relevant.",
+              "gap": "On-call schedule is not stated.",
+              "arrangement": "Remote in the US"
+            },
+            "requirements": [
+              "Fictional requirement: improve service observability.",
+              "Fictional requirement: investigate production reliability incidents."
+            ]
+          },
+          "revision": 1,
+          "decision": "pending",
+          "note": "",
+          "changed": false
+        }
+      ],
+      "remaining_jobs": 3
+    }
+  ],
+  "card_reviews": []
+}
